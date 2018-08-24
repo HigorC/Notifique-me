@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Salas próximas a você</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item-divider color="light">Disponíveis</ion-item-divider>
+    <ion-item *ngFor="let sala of salas | async" (click)="entrarNaSala(sala)">
+      <ion-avatar item-start>
+        <img src="assets/imgs/group.png">
+      </ion-avatar>
+      <h2>{{sala.nome}}</h2>
+    </ion-item>
+    
+
+
+
+    <ion-item-divider color="light">Um pouco mais distantes</ion-item-divider>
+    <ion-item>
+      <ion-avatar item-start>
+        <img src="assets/imgs/group.png">
+      </ion-avatar>
+      <h2>Slimer 2</h2>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-fab bottom right>
+    <button ion-fab (click)="novaSala()"> <ion-icon name="add"></ion-icon></button>
+  </ion-fab>
+</ion-content>

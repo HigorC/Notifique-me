@@ -1,0 +1,59 @@
+page-conversa {
+}
+
+.icon-voltar{
+    color: #ffffff;
+}
+
+ion-modal {
+    .modal-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.autorMensagem{
+    font-size: 11px;
+    color: #878787
+}
+
+.proprioAutor{
+    float: right;
+    background-color: #a9d0ff;
+}
+
+.outroAutor{
+    float: left;
+    background-color: #ececec;
+}
+
+.mensagem{
+    font-size: 15px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    clear: both;
+    border-radius: 3px;
+    max-width: 85%;
+    text-align: justify;
+    border: 1px solid #e6e6e6;
+}
+
+ion-footer{
+    background-color: #f7f7f7;
+}
+
+
+.content-md{
+    background-color: #fbfbfb;
+}
+
+.teste{
+    background-color: #ececec;
+    font-size: 14px;
+    padding: 3px 5px;
+    margin-bottom: 5px;
+}
