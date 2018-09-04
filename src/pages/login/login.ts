@@ -36,7 +36,7 @@ export class LoginPage {
   }
 
   register() {
-    this.navCtrl.push('RegistroPage');
+    this.navCtrl.push('RegistrarUsuarioPage');
   }
 
 }

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { User } from '../../models/user';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
 
 /**
  * Generated class for the ConfiguracoesPage page.
@@ -15,11 +17,19 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ConfiguracoesPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  usuario = {};
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private usuarioProvider: UsuarioProvider) {
+    this.usuario = usuarioProvider.getUsuarioAtualSimplificado();
+    
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ConfiguracoesPage');
+  }
+
+  salvar() {
+    this.usuarioProvider.atualizarUsuario(this.usuario);
   }
 
 }

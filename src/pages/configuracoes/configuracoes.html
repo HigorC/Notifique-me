@@ -15,10 +15,11 @@
 
 <ion-content padding>
   <ion-list>
-
     <ion-item>
       <ion-label floating>Apelido</ion-label>
-      <ion-input type="text" ></ion-input>
+      <ion-input type="text" [(ngModel)]="usuario.displayName"></ion-input>
     </ion-item>
   </ion-list>
+
+  <button ion-button block (click)="salvar()">Salvar</button>
 </ion-content>
