@@ -14,8 +14,6 @@ export class LoginPage {
 
   user = { email: 'novo@novo.com', senha: '123456' } as User;
 
-
-
   constructor(private afAuth: AngularFireAuth,
     public navCtrl: NavController) {
 

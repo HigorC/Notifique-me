@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { SalasProvider } from '../../providers/salas/salas';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
 
 /**
  * Generated class for the RegistrarSalaPage page.
@@ -18,15 +19,12 @@ export class RegistrarSalaPage {
 
   sala = {};
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private salasProvider: SalasProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private salasProvider: SalasProvider, private usuarioProvider: UsuarioProvider) {
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad RegistrarSalaPage');
-  }
-
-  salvarSala(nomeSala) {
-    this.salasProvider.save(nomeSala);
+  salvarSala(sala) {
+    sala.criador = this.usuarioProvider.getEmailUsuarioAtual();
+    this.salasProvider.save(sala);
     this.viewCtrl.dismiss();
   }
 

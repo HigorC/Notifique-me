@@ -21,7 +21,7 @@ export class UsuarioProvider {
 
   constructor(private aFauth: AngularFireAuth,
     private db: AngularFireDatabase) {
-    this.usuariosRef = this.db.list('salas');
+    this.usuariosRef = this.db.list('usuarios');
     // Use snapshotChanges().map() to store the key
     this.usuarios = this.usuariosRef.snapshotChanges().pipe(
       map(changes =>
@@ -36,8 +36,7 @@ export class UsuarioProvider {
 
   getUsuarioAtualSimplificado() {
     let usuarioSimplificado = {} as User;
-    // let usuarioSimplificado: User;
-    let usuarioCompleto = this.getUsuarioAtual();
+    const usuarioCompleto = this.getUsuarioAtual();
 
     usuarioSimplificado.email = usuarioCompleto.email;
     usuarioSimplificado.displayName = usuarioCompleto.displayName;
@@ -46,14 +45,35 @@ export class UsuarioProvider {
     return usuarioSimplificado;
   }
 
+  getEmailUsuarioAtual(): string {
+    return this.getUsuarioAtual().email;
+  }
+
+  getDisplayNameUsuarioAtual(): string {
+    return this.getUsuarioAtual().displayName;
+  }
+
+  getIdUsuarioAtual(): string {
+    // let result = await this.aFauth.auth.currentUser.getIdToken().then(function (data) {
+    //   // console.log(data);
+
+    //   return data;
+    // })
+
+    // return result;
+    return this.getUsuarioAtual().uid;
+  }
 
   async registrarNovoUsuario(usuario: User) {
     try {
       let result = await this.aFauth.auth.createUserWithEmailAndPassword(usuario.email, usuario.senha).then(function (data) {
-        // console.log('>>> ' + data);
-        // this.db.list('usuarios/' + data.user + '/mensagens/').push(mensagem);
+        return data;
       });
-      // console.log(result);
+
+      console.log(result);
+
+      this.db.list('usuarios/').push(result.user.uid);
+
     } catch (e) {
       console.error(e);
     }

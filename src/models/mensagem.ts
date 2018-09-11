@@ -1,4 +1,6 @@
 export interface Mensagem {
-    autor: string;
-    texto: string;
+    emailAutor: string;
+    apelidoAutor: string;
+    mensagem: string;
+    dataEnvio: string;
 }

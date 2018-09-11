@@ -12,11 +12,18 @@
         <ion-icon name="md-arrow-back" class="icon-voltar"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title>{{sala.nome}}</ion-title>
+
+    <ion-buttons right *ngIf="sala && sala.criador === meuEmail">
+      <button ion-button icon-only (click)="mostrarOpcoesDaSala()">
+        <ion-icon name="settings" class="icon-voltar"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title *ngIf="sala">{{sala.nome}}</ion-title>
   </ion-navbar>
 
 
 </ion-header>
+
 
 
 <ion-content padding>
@@ -30,8 +37,10 @@
   </ion-card> -->
 
   <div *ngFor="let mensagem of mensagens | async">
-    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.autor == meuEmail,'outroAutor':mensagem.autor != meuEmail}">
-      {{mensagem.texto}}
+    <!-- <span *ngIf="mensagem.excluirSala"></span> -->
+    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.emailAutor == meuEmail,'outroAutor':mensagem.emailAutor != meuEmail}">
+      <p class="autor">{{mensagem.apelidoAutor}} - {{mensagem.dataEnvio}}</p>
+      {{mensagem.mensagem}}
     </span>
   </div>
 

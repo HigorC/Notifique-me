@@ -16,7 +16,7 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class RegistrarUsuarioPage {
 
-  user = {} as User;
+  user = { email: 'h@h.com', senha: '123456' } as User;
 
   constructor(
     private usuarioProvider: UsuarioProvider, public navCtrl: NavController, public navParams: NavParams) {

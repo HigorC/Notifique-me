@@ -28,6 +28,7 @@ export class SalasProvider {
   }
 
   get(key: string) {
+    return this.db.object('salas/' + key).valueChanges();
   }
 
   save(sala: any) {
@@ -35,7 +36,11 @@ export class SalasProvider {
   }
 
   remove(key: string) {
-    return this.db.list(this.PATH).remove(key);
+    this.db.object('salas/' + key).update({ excluirSala: true }).then(function () {
+      this.db.list(this.PATH).remove(key);
+    });
+
+    // return this.db.list(this.PATH).remove(key);
   }
 
   getMensagens(keySala) {
@@ -48,5 +53,29 @@ export class SalasProvider {
 
   enviarMensagem(KeySala, mensagem) {
     this.db.list('salas/' + KeySala + '/mensagens/').push(mensagem);
+  }
+
+  getUsuariosDeUmaSala(keySala) {
+    return this.db.list('salas/' + keySala + '/usuarios').valueChanges();
+  }
+
+  removerTodosUsuariosDeUmaSala(keySala){
+    
+  }
+
+  async cadastrarUsuarioNaSala(keySala, keyUsuario) {
+    const that = this;
+
+    this.getUsuariosDeUmaSala(keySala).forEach(function (observable) {
+      if (observable.map(function (usuario: any) {
+        return usuario.key;
+      }).indexOf(keyUsuario) === -1) {
+        that.db.list('salas/' + keySala + '/usuarios/').push({ key: keyUsuario });
+      } else{
+        console.log('usuario ja esta na sala');
+      }
+
+
+    });
   }
 }

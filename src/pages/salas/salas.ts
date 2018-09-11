@@ -41,11 +41,7 @@ export class SalasPage {
   }
 
   entrarNaSala(sala) {
-
-    console.log(sala);
-
-
-    let conversaModal = this.modalCtrl.create(ConversaPage, {sala:sala});
+    let conversaModal = this.modalCtrl.create(ConversaPage, {salaKey:sala.key});
     conversaModal.present();
 
     conversaModal.onDidDismiss(data => {

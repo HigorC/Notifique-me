@@ -65,6 +65,8 @@ export class HomePage {
 
   atual() {
     console.log(this.afAuth.auth.currentUser);
+    console.log(this.afAuth.auth.currentUser.getIdToken());
+    
   }
 
   adicionarAmigo() {
