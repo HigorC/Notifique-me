@@ -29,19 +29,22 @@ export class SalasProvider {
 
   get(key: string) {
     return this.db.object('salas/' + key).valueChanges();
-  }
+  };
 
   save(sala: any) {
     this.salasRef.push(sala);
-  }
+  };
 
   remove(key: string) {
-    this.db.object('salas/' + key).update({ excluirSala: true }).then(function () {
-      this.db.list(this.PATH).remove(key);
-    });
+    // this.db.object('salas/' + key).update({ excluirSala: true }).then(function () {
+    //   this.db.list(this.PATH).remove(key);
+    // });
+
+
+    this.removerTodosUsuariosDeUmaSala(key);
 
     // return this.db.list(this.PATH).remove(key);
-  }
+  };
 
   getMensagens(keySala) {
     return this.db.list('salas/' + keySala + '/mensagens/').snapshotChanges().pipe(
@@ -49,33 +52,68 @@ export class SalasProvider {
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
       )
     );
-  }
+  };
 
   enviarMensagem(KeySala, mensagem) {
     this.db.list('salas/' + KeySala + '/mensagens/').push(mensagem);
-  }
+  };
 
-  getUsuariosDeUmaSala(keySala) {
+  getUsuario(keyUsuario, keySala) {
+    return this.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).snapshotChanges();
+  };
+
+  getUsuariosDeUmaSalaComListener(keySala) {
     return this.db.list('salas/' + keySala + '/usuarios').valueChanges();
-  }
+  };
 
-  removerTodosUsuariosDeUmaSala(keySala){
-    
-  }
+  getAllUsuariosDeUmaSalaSemListener(keySala) {
+    return this.db.database.ref('salas/' + keySala + '/usuarios').once('value');
+  };
+
+  isSalaVazia(keySala) {
+    return this.db.database.ref('salas/' + keySala + '/usuarios/').orderByChild('bloqueado').equalTo(false).once('value').then(function (res) {
+      return res.val() === null
+    });
+  };
+
+  bloquearUsuarioDeUmaSala(keyUsuario, keySala) {
+    this.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).update({ bloqueado: true });
+  };
+
+  removerTodosUsuariosDeUmaSala(keySala) {
+    const that = this;
+    this.getAllUsuariosDeUmaSalaSemListener(keySala).then(function (usuarios) {
+      usuarios.forEach(function (childSnapshot) {
+        that.bloquearUsuarioDeUmaSala(childSnapshot.key, keySala);
+        // Apenas remove a sala do banco de dados se todos os usuarios forem expulsos antes
+        that.isSalaVazia(keySala).then(function (res) {
+          if (res) {
+            that.db.list(that.PATH).remove(keySala);
+          }
+        });
+      });
+    });
+  };
+
+
+  async salaTemUsuario(keySala, keyUsuario) {
+    return await this.db.database.ref('salas/' + keySala + '/usuarios/').orderByKey().equalTo(keyUsuario).once('value').then(function (snapshot) {
+      return snapshot.val() !== null;
+    });
+  };
 
   async cadastrarUsuarioNaSala(keySala, keyUsuario) {
     const that = this;
+    this.salaTemUsuario(keySala, keyUsuario).then(function (usuarioEstaNaSala) {
+      if (!usuarioEstaNaSala) {
 
-    this.getUsuariosDeUmaSala(keySala).forEach(function (observable) {
-      if (observable.map(function (usuario: any) {
-        return usuario.key;
-      }).indexOf(keyUsuario) === -1) {
-        that.db.list('salas/' + keySala + '/usuarios/').push({ key: keyUsuario });
-      } else{
-        console.log('usuario ja esta na sala');
+        that.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).update({ bloqueado: false });
+
+        console.log('usuario cadastrado');
+      } else {
+        console.log('ja existe');
       }
+    })
 
-
-    });
-  }
+  };
 }

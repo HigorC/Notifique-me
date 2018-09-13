@@ -41,12 +41,6 @@ export class ConversaPage {
     this.salasProvider.get(this.salaKey).subscribe(
       data => {
         this.sala = data;
-        console.log(this.sala);
-
-
-        if (this.sala.excluirSala) {
-          this.salaExcluida();
-        }
       }
     );
 
@@ -60,11 +54,23 @@ export class ConversaPage {
     //   console.log(id);
     // });
 
-    console.log(this.usuarioProvider.getIdUsuarioAtual());
-    
+
+    const that = this;
+    this.salasProvider.cadastrarUsuarioNaSala(this.salaKey, this.usuarioProvider.getIdUsuarioAtual()).then(function () {
+      that.salasProvider.getUsuario(that.usuarioProvider.getIdUsuarioAtual(), that.salaKey).subscribe(function (usuario: any) {
+        // Verifica se o usuário atual está bloqueado, se estiver manda-o para a lista de salas
+        console.log('----');
+
+        console.log(usuario.payload.val());
+
+        if (usuario.payload.val() && usuario.payload.val().bloqueado) {
+          that.salaExcluida();
+        }
+
+      });
+    });
 
 
-    this.salasProvider.cadastrarUsuarioNaSala(this.salaKey, this.usuarioProvider.getIdUsuarioAtual());
 
     this.mensagens = this.salasProvider.getMensagens(this.salaKey);
   }
