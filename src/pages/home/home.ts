@@ -53,14 +53,7 @@ export class HomePage {
   }
 
   deslogar() {
-    this.subUsuario.unsubscribe();
-    this.afAuth.auth.signOut().then((data) => {
-      this.navCtrl.popToRoot();
-      // this.navCtrl.setRoot('LoginPage');
-    }, (error) => {
-      console.log(error);
-    });
-    // this.navCtrl.push('LoginPage');
+    this.afAuth.auth.signOut();
   }
 
   atual() {

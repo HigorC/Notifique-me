@@ -34,6 +34,10 @@ export class UsuarioProvider {
     return this.aFauth.auth.currentUser;
   }
 
+  getUsuarioPorId(key) {
+    return this.db.database.ref('usuarios/' + key).once('value');
+  }
+
   getUsuarioAtualSimplificado() {
     let usuarioSimplificado = {} as User;
     const usuarioCompleto = this.getUsuarioAtual();
@@ -64,25 +68,21 @@ export class UsuarioProvider {
     return this.getUsuarioAtual().uid;
   }
 
-  async registrarNovoUsuario(usuario: User) {
-    try {
-      let result = await this.aFauth.auth.createUserWithEmailAndPassword(usuario.email, usuario.senha).then(function (data) {
-        return data;
-      });
+  logar(email, senha) {
+    return this.aFauth.auth.signInWithEmailAndPassword(email, senha);
+  }
 
-      console.log(result);
-
-      this.db.list('usuarios/').push(result.user.uid);
-
-    } catch (e) {
-      console.error(e);
-    }
+  registrarNovoUsuario(usuario: User) {
+    const that = this;
+    return this.aFauth.auth.createUserWithEmailAndPassword(usuario.email, usuario.senha).then(function (data) {
+      that.db.object('usuarios/' + data.user.uid).set({ nome: data.user.displayName, email: data.user.email });
+    });
   }
 
   async atualizarUsuario(usuario) {
 
     console.log(usuario.displayName);
-
+    this.db.object('usuarios/' + this.getIdUsuarioAtual()).update({ nome: usuario.displayName });
     this.aFauth.auth.currentUser.updateProfile(
       {
         displayName: usuario.displayName,

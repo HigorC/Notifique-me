@@ -25,6 +25,8 @@ export class SalasPage {
     public modalCtrl: ModalController,
     private salasProvider: SalasProvider) {
     this.salas = this.salasProvider.getAll();
+
+    // this.salasProvider.getAllNaoBloqueadas(this.);
   }
 
   ionViewDidLoad() {
@@ -41,7 +43,7 @@ export class SalasPage {
   }
 
   entrarNaSala(sala) {
-    let conversaModal = this.modalCtrl.create(ConversaPage, {salaKey:sala.key});
+    let conversaModal = this.modalCtrl.create(ConversaPage, { salaKey: sala.key });
     conversaModal.present();
 
     conversaModal.onDidDismiss(data => {

@@ -1,30 +1,39 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
+import { UsuarioProvider } from '../usuario/usuario';
 
 @Injectable()
 export class SalasProvider {
 
   private PATH = 'salas/';
-
+  private aba = this;
   salasRef: AngularFireList<any>;
   salas: Observable<any[]>;
 
-  constructor(private db: AngularFireDatabase) {
+  constructor(private db: AngularFireDatabase, private usuarioProvider: UsuarioProvider) {
     this.salasRef = this.db.list('salas');
-    // Use snapshotChanges().map() to store the key
     this.salas = this.salasRef.snapshotChanges().pipe(
       map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
       )
     );
   }
+
   getAll() {
     return this.salas;
+  };
+
+  getAllNaoBloqueadas(keyUsuario) {
+    this.db.database.ref('salas/').once('value').then(function (salas) {
+      salas.forEach(function (sala) {
+        console.log('---');
+        console.log(sala.val());
+      });
+    });
   }
 
   get(key: string) {
@@ -36,14 +45,7 @@ export class SalasProvider {
   };
 
   remove(key: string) {
-    // this.db.object('salas/' + key).update({ excluirSala: true }).then(function () {
-    //   this.db.list(this.PATH).remove(key);
-    // });
-
-
     this.removerTodosUsuariosDeUmaSala(key);
-
-    // return this.db.list(this.PATH).remove(key);
   };
 
   getMensagens(keySala) {
@@ -70,6 +72,60 @@ export class SalasProvider {
     return this.db.database.ref('salas/' + keySala + '/usuarios').once('value');
   };
 
+
+
+  async getArrayAllUsuariosKeysDeUmaSalaSemListener(keySala) {
+    const that = this;
+
+    let arrayAllUsuarios = [];
+
+    return this.getAllUsuariosDeUmaSalaSemListener(keySala).then(function (usuarios) {
+
+      const escopoSL = this;
+
+      usuarios.forEach(function (usuarioSala) {
+        const escopoUsuariosSala = this;
+        console.log(usuarioSala);
+        const obj_1 = usuarioSala;
+
+        let usuario = that.usuarioProvider.getUsuarioPorId(usuarioSala.key).then(function (usuario: any) {
+          return usuario;
+        }).then(function (usuario) {
+          return usuario;
+        });
+
+        usuario.then(function (u) {
+          arrayAllUsuarios.push(
+            { nome: u.val().nome,
+              email: u.val().email,
+              bloqueado: usuarioSala.val().bloqueado
+             }
+            );
+          that.usuarioProvider;
+          console.log(u);
+          console.log(usuarioSala);
+        })
+      })
+
+      // return Object.keys(usuarios.val()).forEach(function (keay) {
+      // that.usuarioProvider.getUsuarioPorId(key).then(function (u) {
+      //   console.log(u);
+
+      //   u.val().nome
+      // });
+      // console.log('s');
+
+      // usuarios.val()[i]
+      // });
+    }).then(function(res){
+      console.log(res);
+      console.log(arrayAllUsuarios);
+
+      return arrayAllUsuarios;
+    
+    });
+  }
+
   isSalaVazia(keySala) {
     return this.db.database.ref('salas/' + keySala + '/usuarios/').orderByChild('bloqueado').equalTo(false).once('value').then(function (res) {
       return res.val() === null
@@ -94,7 +150,6 @@ export class SalasProvider {
       });
     });
   };
-
 
   async salaTemUsuario(keySala, keyUsuario) {
     return await this.db.database.ref('salas/' + keySala + '/usuarios/').orderByKey().equalTo(keyUsuario).once('value').then(function (snapshot) {

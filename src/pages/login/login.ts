@@ -4,6 +4,7 @@ import { User } from '../../models/user';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { convertUrlToSegments } from 'ionic-angular/umd/navigation/url-serializer';
 import { TabsPage } from '../tabs/tabs';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
 
 @IonicPage()
 @Component({
@@ -12,25 +13,22 @@ import { TabsPage } from '../tabs/tabs';
 })
 export class LoginPage {
 
-  user = { email: 'novo@novo.com', senha: '123456' } as User;
+  user = { email: 'a@a.com', senha: '123456' } as User;
 
   constructor(private afAuth: AngularFireAuth,
-    public navCtrl: NavController) {
+    public navCtrl: NavController,
+    private usuarioProvider: UsuarioProvider) {
 
   }
 
-  async login(user: User) {
-    try {
-      const result = this.afAuth.auth.signInWithEmailAndPassword(user.email, user.senha);
-
-      if (result) {
-        this.navCtrl.setRoot(TabsPage);
-        console.log(result);
-      }
-    }
-    catch (e) {
-      console.error(e);
-    }
+  login(user: User) {
+    const that = this;
+    this.usuarioProvider.logar(user.email, user.senha).then(function (res) {
+      console.log(res);
+      that.navCtrl.setRoot(TabsPage);
+    }).catch(function (error) {
+      console.log(error);
+    });
   }
 
   register() {

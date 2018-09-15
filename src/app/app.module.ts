@@ -26,6 +26,7 @@ import { ConversaPage } from '../pages/conversa/conversa';
 import { ConversasProvider } from '../providers/conversas/conversas';
 import { ConfiguracoesPage } from '../pages/configuracoes/configuracoes';
 import { UsuarioProvider } from '../providers/usuario/usuario';
+import { ConfigSalaModalPage } from '../pages/config-sala-modal/config-sala-modal';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { UsuarioProvider } from '../providers/usuario/usuario';
     SalasPage,
     RegistrarSalaPage,
     ConversaPage,
-    ConfiguracoesPage
+    ConfiguracoesPage,
+    ConfigSalaModalPage
   ],
   imports: [
     BrowserModule,
@@ -54,7 +56,8 @@ import { UsuarioProvider } from '../providers/usuario/usuario';
     SalasPage,
     RegistrarSalaPage,
     ConversaPage,
-    ConfiguracoesPage
+    ConfiguracoesPage,
+    ConfigSalaModalPage
   ],
   providers: [
     StatusBar,
