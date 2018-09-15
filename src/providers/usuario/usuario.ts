@@ -29,7 +29,7 @@ export class UsuarioProvider {
       )
     );
   }
-
+ 
   getUsuarioAtual() {
     return this.aFauth.auth.currentUser;
   }
