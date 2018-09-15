@@ -31,7 +31,7 @@ export class UsuarioProvider {
   }
  
   getUsuarioAtual() {
-    return this.aFauth.auth.currentUser;
+    return this.aFauth.auth.currentUser
   }
 
   getUsuarioPorId(key) {
