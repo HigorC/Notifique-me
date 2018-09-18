@@ -7,46 +7,38 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{title}}</ion-title>
+    <ion-title>Amigos</ion-title>
   </ion-navbar>
-
 </ion-header>
 
 
-<ion-content padding>
-
-  <!-- <form [formGroup]='form'> -->
-
-  <!-- <ion-item>
-      <ion-label stacked>Nome</ion-label>
-      <ion-input formControlName="nome"></ion-input>
-    </ion-item>
-    <ion-item *ngIf="!form.controls.nome.valid && (form.controls.nome.dirty || form.controls.nome.touched)" color="danger">
-      <div [hidden]="!form.controls.nome.errors.required">
-        obrigatorio
-      </div>
-    </ion-item>
-
-    <ion-item>
-      <ion-label stacked>Email</ion-label>
-      <ion-input formControlName="email"></ion-input>
-    </ion-item>
-    <ion-item *ngIf="!form.controls.email.valid && (form.controls.email.dirty || form.controls.email.touched)" color="danger">
-      <div [hidden]="!form.controls.email.errors.required">
-        obrigatorio
-      </div>
-    </ion-item> -->
-
-  <ion-item>
-    <ion-input [(ngModel)]="amigo.nome"></ion-input>
-  </ion-item>
-  <ion-item>
-    <ion-input [(ngModel)]="amigo.email"></ion-input>
-  </ion-item>
-
-  <div padding>
-    <button ion-button block type="submit" (click)='onSubmit(amigo)'>Salvar</button>
-  </div>
-  <!-- </form> -->
-
-</ion-content>
+<ion-content>
+    <ion-list>
+      <ion-item-divider color="light">Convites</ion-item-divider>
+      <ion-item *ngFor="let convite of meusConvites  " >
+        <ion-avatar item-start>
+          <img src="assets/imgs/friend.png">
+        </ion-avatar>
+        <h2>{{convite.nome}}</h2>
+        <h2>{{convite.email}}</h2>
+        <ion-icon name="close" class="recusar-convite" (click)="recusarConvite()" item-end></ion-icon>
+        <ion-icon name="checkmark" class="aceitar-convite"  (click)="aceitarConvite()" item-end></ion-icon>
+      </ion-item>
+      
+  
+  
+  
+      <ion-item-divider color="light">Amigos</ion-item-divider>
+      <ion-item>
+        <ion-avatar item-start>
+          <img src="assets/imgs/friend.png">
+        </ion-avatar>
+        <h2>Amigão</h2>
+      </ion-item>
+  
+    </ion-list>
+  
+    <ion-fab bottom right>
+      <button ion-fab (click)="adicionarAmigo()"> <ion-icon name="add"></ion-icon></button>
+    </ion-fab>
+  </ion-content>

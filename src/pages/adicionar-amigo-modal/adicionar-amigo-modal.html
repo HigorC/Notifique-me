@@ -1,0 +1,26 @@
+<!--
+  Generated template for the AdicionarAmigoModalPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Adicionar amigo</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <ion-item>
+        <ion-input placeholder="Email do seu amigo" [(ngModel)]="emailAmigo"></ion-input>
+      </ion-item>
+      <ion-row>
+        <ion-col>
+          <button ion-button color="danger" (click)="fecharModal()" type="submit">Cancelar</button>
+          <button ion-button color="secondary" (click)="adicionarAmigo(emailAmigo)" type="submit">Enviar Convite</button>
+        </ion-col>
+      </ion-row>
+</ion-content>

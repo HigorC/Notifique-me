@@ -18,19 +18,24 @@ import { ConversaPage } from '../conversa/conversa';
   templateUrl: 'salas.html',
 })
 export class SalasPage {
-  salas: Observable<any>;
+  // salas: Observable<any>;
+  salas;
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public modalCtrl: ModalController,
     private salasProvider: SalasProvider) {
-    this.salas = this.salasProvider.getAll();
-
-    // this.salasProvider.getAllNaoBloqueadas(this.);
+    // this.salas = this.salasProvider.getAll();
+    this.atualizarSalasDisponiveis();
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad SalasPage');
+  atualizarSalasDisponiveis() {
+    const that = this;
+    this.salasProvider.getAllNaoBloqueadas().then(function (res) {
+      console.log('aqui');
+      that.salas = res;
+      console.log(res);
+    });
   }
 
   novaSala() {

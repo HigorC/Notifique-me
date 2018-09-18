@@ -13,7 +13,7 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class LoginPage {
 
-  user = { email: 'a@a.com', senha: '123456' } as User;
+  user = { email: 'b@b.com', senha: '123456' } as User;
 
   constructor(private afAuth: AngularFireAuth,
     public navCtrl: NavController,
@@ -25,6 +25,7 @@ export class LoginPage {
     const that = this;
     this.usuarioProvider.logar(user.email, user.senha).then(function (res) {
       console.log(res);
+      
       that.navCtrl.setRoot(TabsPage);
     }).catch(function (error) {
       console.log(error);

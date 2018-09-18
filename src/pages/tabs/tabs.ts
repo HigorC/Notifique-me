@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { SalasPage } from '../salas/salas';
 import { ConfiguracoesPage } from '../configuracoes/configuracoes';
+import { AmigosPage } from '../amigos/amigos';
 
 @IonicPage()
 @Component({
@@ -12,7 +13,7 @@ import { ConfiguracoesPage } from '../configuracoes/configuracoes';
 export class TabsPage {
 
   tab1 = SalasPage;
-  tab2 = HomePage;
+  tab2 = AmigosPage;
   tab3 = ConfiguracoesPage;
 
   ionViewDidLoad() {

@@ -1,5 +1,10 @@
 <ion-header>
   <ion-navbar>
+      <ion-buttons right>
+          <button ion-button icon-only (click)="atualizarSalasDisponiveis()">
+            <ion-icon name="refresh" class=""></ion-icon>
+          </button>
+        </ion-buttons>
     <ion-title>Salas próximas a você</ion-title>
   </ion-navbar>
 </ion-header>
@@ -7,7 +12,7 @@
 <ion-content>
   <ion-list>
     <ion-item-divider color="light">Disponíveis</ion-item-divider>
-    <ion-item *ngFor="let sala of salas | async" (click)="entrarNaSala(sala)">
+    <ion-item *ngFor="let sala of salas " (click)="entrarNaSala(sala)">
       <ion-avatar item-start>
         <img src="assets/imgs/group.png">
       </ion-avatar>

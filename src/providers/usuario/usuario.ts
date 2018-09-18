@@ -29,7 +29,7 @@ export class UsuarioProvider {
       )
     );
   }
- 
+
   getUsuarioAtual() {
     return this.aFauth.auth.currentUser
   }
@@ -58,13 +58,6 @@ export class UsuarioProvider {
   }
 
   getIdUsuarioAtual(): string {
-    // let result = await this.aFauth.auth.currentUser.getIdToken().then(function (data) {
-    //   // console.log(data);
-
-    //   return data;
-    // })
-
-    // return result;
     return this.getUsuarioAtual().uid;
   }
 
@@ -95,6 +88,38 @@ export class UsuarioProvider {
       console.error(err);
 
     })
+  }
+
+  getKeyUsuarioByEmail(email) {
+    return this.db.database.ref('usuarios/').orderByChild('email').equalTo(email).once('value').then(function (res) {
+      return res.val() ? Object.keys(res.val())[0] : null
+    });
+  }
+
+  enviarConviteAmizade(email) {
+    const that = this;
+    this.getKeyUsuarioByEmail(email).then(function (key) {
+      if (key) {
+        that.db.list('usuarios/' + key + '/convites/').push({ key: that.getIdUsuarioAtual() });
+      }
+    });
+  }
+
+  getAllConvites() {
+    // return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/convites/').valueChanges();
+    const that = this;
+    return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/convites/').snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c => (
+          {
+            // key: c.payload.key, ...c.payload.val(),
+            u: that.getUsuarioPorId(c.payload.val().key).then(function(res){
+              return res.val();
+            })
+          }
+        ))
+      )
+    );
   }
 
 }

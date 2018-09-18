@@ -22,13 +22,26 @@
 
   <ion-list>
     <ion-item>
-      <ion-label>Remover usuários</ion-label>
-      <ion-select [(ngModel)]="usuario" multiple="true" cancelText="Cancelar" okText="Remover" [compareWith]="compareFn">
-        <ion-option *ngFor="let usuario of todosUsuarios" [value]="usuario">{{usuario.nome}}
-          - {{usuario.bloqueado}}</ion-option>
-
+      <ion-label>Bloquear usuários</ion-label>
+      <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear" (ionChange)="bloquearUsuarios(usuariosABloquear)">
+        <span *ngFor="let usuario of todosUsuarios">
+          <ion-option *ngIf="!usuario.bloqueado" [value]="usuario">{{usuario.nome}}
+            - {{usuario.bloqueado}}</ion-option>
+        </span>
       </ion-select>
     </ion-item>
+
+    <ion-item>
+      <ion-label>Desbloquear usuários</ion-label>
+      <ion-select [(ngModel)]="usuariosADesbloquear" multiple="true" cancelText="Cancelar" okText="Desbloquear"
+        (ionChange)="desbloquearUsuarios(usuariosADesbloquear)">
+        <span *ngFor="let usuario of todosUsuarios">
+          <ion-option *ngIf="usuario.bloqueado" [value]="usuario">{{usuario.nome}}
+            - {{usuario.bloqueado}}</ion-option>
+        </span>
+      </ion-select>
+    </ion-item>
+
     <ion-item>
       <button ion-button block color="danger" (click)="excluirSala()">Excluir Sala</button>
     </ion-item>

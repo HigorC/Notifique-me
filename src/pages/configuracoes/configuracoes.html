@@ -19,7 +19,17 @@
       <ion-label floating>Apelido</ion-label>
       <ion-input type="text" [(ngModel)]="usuario.displayName"></ion-input>
     </ion-item>
+    <ion-item>
+      <button ion-button block (click)="deslogar()">Deslogar</button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block (click)="salvar()">Salvar</button>
+    </ion-item>
   </ion-list>
 
-  <button ion-button block (click)="salvar()">Salvar</button>
+
+
+
+
+
 </ion-content>

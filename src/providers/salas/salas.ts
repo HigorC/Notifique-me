@@ -3,14 +3,13 @@ import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, take, filter } from 'rxjs/operators';
 import { UsuarioProvider } from '../usuario/usuario';
 
 @Injectable()
 export class SalasProvider {
 
   private PATH = 'salas/';
-  private aba = this;
   salasRef: AngularFireList<any>;
   salas: Observable<any[]>;
 
@@ -27,13 +26,42 @@ export class SalasProvider {
     return this.salas;
   };
 
-  getAllNaoBloqueadas(keyUsuario) {
-    this.db.database.ref('salas/').once('value').then(function (salas) {
-      salas.forEach(function (sala) {
-        console.log('---');
-        console.log(sala.val());
-      });
-    });
+  async getAllNaoBloqueadas() {
+
+    const keyUsuarioAtual = this.usuarioProvider.getIdUsuarioAtual();
+    let retorno;
+    let arraySalasDisponiveis = [];
+
+    // return this.getAll().forEach(function (salas) {
+    //   retorno = salas.filter(function (sala) {
+
+    //     if (sala.usuarios[keyUsuarioAtual] && sala.usuarios[keyUsuarioAtual].bloqueado === false) {
+
+    //       return sala.usuarios[keyUsuarioAtual].bloqueado === false
+    //     }
+
+    //   })
+    //   return retorno;
+    // })
+
+    return this.db.database.ref('salas/').once('value').then(function (salas) {
+      salas.forEach(function (sala: any) {
+        // console.log(sala.val());
+        if (!sala.val().usuarios || !sala.val().usuarios[keyUsuarioAtual] || sala.val().usuarios[keyUsuarioAtual].bloqueado === false) {
+
+          let s = sala.val();
+          s.key = sala.key;
+          arraySalasDisponiveis.push(s);
+        }
+      })
+
+    }).then(function (res) {
+      // console.log(res);
+      return arraySalasDisponiveis;
+
+    })
+
+
   }
 
   get(key: string) {
@@ -74,20 +102,14 @@ export class SalasProvider {
 
 
 
-  async getArrayAllUsuariosKeysDeUmaSalaSemListener(keySala) {
+  async getArrayAllUsuariosDeUmaSalaSemListener(keySala) {
     const that = this;
 
     let arrayAllUsuarios = [];
 
     return this.getAllUsuariosDeUmaSalaSemListener(keySala).then(function (usuarios) {
 
-      const escopoSL = this;
-
       usuarios.forEach(function (usuarioSala) {
-        const escopoUsuariosSala = this;
-        console.log(usuarioSala);
-        const obj_1 = usuarioSala;
-
         let usuario = that.usuarioProvider.getUsuarioPorId(usuarioSala.key).then(function (usuario: any) {
           return usuario;
         }).then(function (usuario) {
@@ -95,34 +117,20 @@ export class SalasProvider {
         });
 
         usuario.then(function (u) {
-          arrayAllUsuarios.push(
-            { nome: u.val().nome,
-              email: u.val().email,
-              bloqueado: usuarioSala.val().bloqueado
-             }
+          if (u.key !== that.usuarioProvider.getIdUsuarioAtual()) {
+            arrayAllUsuarios.push(
+              {
+                key: u.key,
+                nome: u.val().nome,
+                email: u.val().email,
+                bloqueado: usuarioSala.val().bloqueado
+              }
             );
-          that.usuarioProvider;
-          console.log(u);
-          console.log(usuarioSala);
+          }
         })
       })
-
-      // return Object.keys(usuarios.val()).forEach(function (keay) {
-      // that.usuarioProvider.getUsuarioPorId(key).then(function (u) {
-      //   console.log(u);
-
-      //   u.val().nome
-      // });
-      // console.log('s');
-
-      // usuarios.val()[i]
-      // });
-    }).then(function(res){
-      console.log(res);
-      console.log(arrayAllUsuarios);
-
+    }).then(function (res) {
       return arrayAllUsuarios;
-    
     });
   }
 
@@ -132,15 +140,15 @@ export class SalasProvider {
     });
   };
 
-  bloquearUsuarioDeUmaSala(keyUsuario, keySala) {
-    this.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).update({ bloqueado: true });
+  alterarBloqueioDeUmUsuarioDeUmaSala(keyUsuario, keySala, bloqueio) {
+    this.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).update({ bloqueado: bloqueio });
   };
 
   removerTodosUsuariosDeUmaSala(keySala) {
     const that = this;
     this.getAllUsuariosDeUmaSalaSemListener(keySala).then(function (usuarios) {
       usuarios.forEach(function (childSnapshot) {
-        that.bloquearUsuarioDeUmaSala(childSnapshot.key, keySala);
+        that.alterarBloqueioDeUmUsuarioDeUmaSala(childSnapshot.key, keySala, true);
         // Apenas remove a sala do banco de dados se todos os usuarios forem expulsos antes
         that.isSalaVazia(keySala).then(function (res) {
           if (res) {

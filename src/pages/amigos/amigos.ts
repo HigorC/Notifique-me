@@ -1,7 +1,14 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import { AmigosProvider } from '../../providers/amigos/amigos';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { AdicionarAmigoModalPage } from '../adicionar-amigo-modal/adicionar-amigo-modal';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
+
+/**
+ * Generated class for the AmigosPage page.
+ *
+ * See https://ionicframework.com/docs/components/#navigation for more info on
+ * Ionic pages and navigation.
+ */
 
 @IonicPage()
 @Component({
@@ -9,49 +16,48 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: 'amigos.html',
 })
 export class AmigosPage {
-  title: string;
-  amigo;
-  form: FormGroup;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    private formBuilder: FormBuilder, private provider: AmigosProvider,
-    private toast: ToastController) {
+  meusConvites;
 
-    this.amigo = this.navParams.data.amigo || {};
-    this.setupPageTitle();
-    this.createForm();
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private usuarioProvider: UsuarioProvider) {
+
+    this.prepararConvites();
+
   }
 
-  private setupPageTitle() {
-    this.title = this.navParams.data.amigo ? 'Alterando amigo' : 'Novo amigo';
-  }
+  prepararConvites() {
 
-  createForm() {
-    this.form = this.formBuilder.group({
-      key: [this.amigo.key],
-      nome: [this.amigo.nome, Validators.required],
-      email: [this.amigo.email, Validators.required],
+    const that = this;
+    this.usuarioProvider.getAllConvites().forEach(function (convites) {
+      that.meusConvites = [];
+      convites.forEach(function (convite) {
+        convite.u.then(function (res) {
+          console.log(res);
+          that.meusConvites.push(res)
+        })
+      })
+
+
     })
   }
 
-  onSubmit(amigo) {
+  aceitarConvite() {
+    console.log('convite aceito');
 
-    this.provider.save(amigo);
-    this.toast.create({ message: 'Salvo', duration: 3000 }).present();
-    this.navCtrl.pop();
+  }
 
-    // if (this.form.valid) {
-    //   this.provider.save(this.form.value)
-    //     .then(() => {
-    //       this.toast.create({ message: 'Salvo', duration: 3000 }).present();
-    //       this.navCtrl.pop();
-    //     })
-    //     .catch((e) => {
-    //       this.toast.create({ message: 'erro', duration: 3000 }).present();
-    //       console.error(e);
+  recusarConvite() {
+    console.log('convite recusado');
 
-    //     })
-    // }
+  }
+
+  adicionarAmigo() {
+    let profileModal = this.modalCtrl.create(AdicionarAmigoModalPage);
+    profileModal.present();
+
+    profileModal.onDidDismiss(data => {
+      console.log(data);
+    });
   }
 
 }

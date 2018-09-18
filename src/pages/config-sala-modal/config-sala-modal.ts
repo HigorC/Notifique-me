@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, ToastController } from 'ionic-angular';
 import { SalasProvider } from '../../providers/salas/salas';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { LoginPage } from '../login/login';
 
 /**
  * Generated class for the ConfigSalaModalPage page.
@@ -21,17 +23,11 @@ export class ConfigSalaModalPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController,
     private salasProvider: SalasProvider,
-    public toastCtrl: ToastController) {
+    public toastCtrl: ToastController ) {
 
     this.salaKey = navParams.get('keySala');
 
-    const that = this;
 
-    this.salasProvider.getArrayAllUsuariosKeysDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
-      console.log(usuarios);
-      that.todosUsuarios = usuarios;
-
-    });
 
 
     // this.salasProvider.getAllUsuariosDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
@@ -40,9 +36,35 @@ export class ConfigSalaModalPage {
     // });
   }
 
-  compareFn(e1: any, e2: any): boolean {
-    return e1 && e2 ? e1.bloqueado === e2.bloqueado : e1 === e2;
+  ionViewDidLoad() {
+    this.atualizarListaUsuariosABloquear();
   }
+
+  atualizarListaUsuariosABloquear() {
+    const that = this;
+
+    this.salasProvider.getArrayAllUsuariosDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
+      that.todosUsuarios = usuarios;
+    });
+  }
+
+  bloquearUsuarios(usuariosABloquear: any) {
+    const that = this;
+    usuariosABloquear.forEach(function (usuario) {
+      that.salasProvider.alterarBloqueioDeUmUsuarioDeUmaSala(usuario.key, that.salaKey, true);
+    });
+    this.atualizarListaUsuariosABloquear();
+  }
+
+  desbloquearUsuarios(usuariosADesbloquear: any) {
+    const that = this;
+    usuariosADesbloquear.forEach(function (usuario) {
+      that.salasProvider.alterarBloqueioDeUmUsuarioDeUmaSala(usuario.key, that.salaKey, false);
+    });
+    this.atualizarListaUsuariosABloquear();
+  }
+
+  
 
   excluirSala() {
     //Remove a sala do DB

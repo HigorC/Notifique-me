@@ -27,6 +27,8 @@ import { ConversasProvider } from '../providers/conversas/conversas';
 import { ConfiguracoesPage } from '../pages/configuracoes/configuracoes';
 import { UsuarioProvider } from '../providers/usuario/usuario';
 import { ConfigSalaModalPage } from '../pages/config-sala-modal/config-sala-modal';
+import { AmigosPage } from '../pages/amigos/amigos';
+import { AdicionarAmigoModalPage } from '../pages/adicionar-amigo-modal/adicionar-amigo-modal';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,9 @@ import { ConfigSalaModalPage } from '../pages/config-sala-modal/config-sala-moda
     RegistrarSalaPage,
     ConversaPage,
     ConfiguracoesPage,
-    ConfigSalaModalPage
+    ConfigSalaModalPage,
+    AmigosPage,
+    AdicionarAmigoModalPage
   ],
   imports: [
     BrowserModule,
@@ -57,7 +61,9 @@ import { ConfigSalaModalPage } from '../pages/config-sala-modal/config-sala-moda
     RegistrarSalaPage,
     ConversaPage,
     ConfiguracoesPage,
-    ConfigSalaModalPage
+    ConfigSalaModalPage,
+    AmigosPage,
+    AdicionarAmigoModalPage
   ],
   providers: [
     StatusBar,
