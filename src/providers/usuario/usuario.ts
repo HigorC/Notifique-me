@@ -110,14 +110,16 @@ export class UsuarioProvider {
     const that = this;
     return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/convites/').snapshotChanges().pipe(
       map(changes =>
-        changes.map(c => (
-          {
+        changes.map(function (c: any) {
+          return {
             // key: c.payload.key, ...c.payload.val(),
-            u: that.getUsuarioPorId(c.payload.val().key).then(function(res){
+
+            u: that.getUsuarioPorId(c.payload.val().key).then(function (res) {
               return res.val();
             })
           }
-        ))
+
+        })
       )
     );
   }

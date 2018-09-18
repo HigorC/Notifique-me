@@ -26,7 +26,6 @@ export class AmigosPage {
   }
 
   prepararConvites() {
-
     const that = this;
     this.usuarioProvider.getAllConvites().forEach(function (convites) {
       that.meusConvites = [];
@@ -36,8 +35,6 @@ export class AmigosPage {
           that.meusConvites.push(res)
         })
       })
-
-
     })
   }
 
