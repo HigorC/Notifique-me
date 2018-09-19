@@ -98,11 +98,87 @@ export class UsuarioProvider {
 
   enviarConviteAmizade(email) {
     const that = this;
-    this.getKeyUsuarioByEmail(email).then(function (key) {
+    return this.getKeyUsuarioByEmail(email).then(function (key) {
       if (key) {
-        that.db.list('usuarios/' + key + '/convites/').push({ key: that.getIdUsuarioAtual() });
+        return that.db.database.ref('usuarios/' + key + '/convites/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function (res) {
+          if (res.val() === null) {
+            return that.db.database.ref('usuarios/' + key + '/amigos/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function (res) {
+              if (res.val() === null) {
+                return that.db.list('usuarios/' + key + '/convites/').push({ key: that.getIdUsuarioAtual() });
+              } else {
+                throw new Error('Vocês já são amigos.');
+              }
+            })
+          } else {
+            throw new Error('Você já enviou um convite para este email.');
+          }
+        });
       }
     });
+  }
+
+  excluirConvite(keyConvite) {
+    return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/convites/').remove(keyConvite);
+  }
+
+  aceitarConvite(keyConvite) {
+    const that = this;
+    return this.db.database.ref('usuarios/' + this.getIdUsuarioAtual() + '/convites/' + keyConvite).once('value').then(function (res) {
+      that.db.list('usuarios/' + that.getIdUsuarioAtual() + '/amigos/').push({ key: res.val().key });
+
+      that.db.list('usuarios/' + res.val().key + '/amigos/').push({ key: that.getIdUsuarioAtual() });
+
+      that.excluirConvite(keyConvite);
+
+    })
+  }
+
+  excluirAmigo(keyDBAmigo) {
+    const that = this;
+    this.db.database.ref('usuarios/' + this.getIdUsuarioAtual() + '/amigos/' + keyDBAmigo).once('value').then(function (res) {
+      
+      let keyAmigo = res.val().key;
+
+      that.db.database.ref('usuarios/' + keyAmigo + '/amigos/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function(res){
+        console.log('---');
+        
+        console.log(res.val());
+
+
+        let keyDBUsuarioAtualComoAmigo = Object.keys(res.val())[0];
+
+        that.db.list('usuarios/' + keyAmigo + '/amigos/').remove(keyDBUsuarioAtualComoAmigo).then(function(atualExcluido){
+          that.db.list('usuarios/' + that.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
+        });
+        
+      })
+
+
+      // console.log(res.val().key);
+
+    })
+
+
+    // this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
+  }
+
+  getAllAmigos() {
+    // return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/convites/').valueChanges();
+    const that = this;
+    return this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/amigos/').snapshotChanges().pipe(
+      map(changes =>
+        changes.map(function (c: any) {
+          return {
+            // key: c.payload.key, ...c.payload.val(),
+            key: c.key,
+            u: that.getUsuarioPorId(c.payload.val().key).then(function (res) {
+              return res.val();
+            })
+          }
+
+        })
+      )
+    );
   }
 
   getAllConvites() {
@@ -113,7 +189,7 @@ export class UsuarioProvider {
         changes.map(function (c: any) {
           return {
             // key: c.payload.key, ...c.payload.val(),
-
+            key: c.key,
             u: that.getUsuarioPorId(c.payload.val().key).then(function (res) {
               return res.val();
             })

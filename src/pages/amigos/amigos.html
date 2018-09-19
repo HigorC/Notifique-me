@@ -13,32 +13,64 @@
 
 
 <ion-content>
-    <ion-list>
-      <ion-item-divider color="light">Convites</ion-item-divider>
-      <ion-item *ngFor="let convite of meusConvites  " >
+  <ion-list>
+    <!-- XXXXXXXXXXXXXXXXXXX -->
+    <!-- XXXXX CONVITES XXXXX-->
+    <!-- XXXXXXXXXXXXXXXXXXX -->
+    <ion-item-divider *ngIf="meusConvites && meusConvites.length > 0" color="light">Convites</ion-item-divider>
+    <ion-item-sliding *ngFor="let convite of meusConvites">
+      <ion-item>
         <ion-avatar item-start>
           <img src="assets/imgs/friend.png">
         </ion-avatar>
         <h2>{{convite.nome}}</h2>
         <h2>{{convite.email}}</h2>
-        <ion-icon name="close" class="recusar-convite" (click)="recusarConvite()" item-end></ion-icon>
-        <ion-icon name="checkmark" class="aceitar-convite"  (click)="aceitarConvite()" item-end></ion-icon>
       </ion-item>
-      
-  
-  
-  
-      <ion-item-divider color="light">Amigos</ion-item-divider>
+      <ion-item-options side="left">
+        <button ion-button (click)="recusarConvite(convite.key)" color="danger">
+          <ion-icon name="close"></ion-icon>
+          Recusar
+        </button>
+      </ion-item-options>
+      <ion-item-options side="rigth">
+        <button ion-button (click)="aceitarConvite(convite.key)" color="secondary">
+          <ion-icon name="checkmark"></ion-icon>
+          Aceitar
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+
+    <!-- XXXXXXXXXXXXXXXXXXX -->
+    <!-- XXXXX AMIGOS XXXXXXX-->
+    <!-- XXXXXXXXXXXXXXXXXXX -->
+
+    <ion-item-divider color="light">Amigos</ion-item-divider>
+    <ion-item class="aviso-sem-amigos" *ngIf="meusAmigos && meusAmigos.length === 0">
+      Poxa parece que você ainda não tem nenhum amigo... mas não desanime... vá para as salas e tente fazer alguns :)
+    </ion-item>
+    <ion-item-sliding *ngFor="let amigo of meusAmigos">
       <ion-item>
         <ion-avatar item-start>
           <img src="assets/imgs/friend.png">
         </ion-avatar>
-        <h2>Amigão</h2>
+        <h2>{{amigo.nome}}</h2>
+        <h2>{{amigo.email}}</h2>
       </ion-item>
-  
-    </ion-list>
-  
-    <ion-fab bottom right>
-      <button ion-fab (click)="adicionarAmigo()"> <ion-icon name="add"></ion-icon></button>
-    </ion-fab>
-  </ion-content>
+      <ion-item-options side="right">
+        <button ion-button (click)="excluirAmigo(amigo.key)" color="danger">
+          <ion-icon name="trash"></ion-icon>
+          Excluir
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+
+
+
+  </ion-list>
+
+  <ion-fab bottom right>
+    <button ion-fab (click)="adicionarAmigo()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>
