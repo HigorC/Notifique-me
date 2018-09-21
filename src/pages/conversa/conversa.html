@@ -13,9 +13,13 @@
       </button>
     </ion-buttons>
 
-    <ion-buttons right *ngIf="sala && sala.criador === meuEmail">
+    <ion-buttons right>
       <button ion-button icon-only (click)="mostrarOpcoesDaSala()">
-        <ion-icon name="settings" class="icon-voltar"></ion-icon>
+        <ion-icon name="settings" *ngIf="sala && sala.criador === meuEmail; else usuarios" class="icon-voltar"></ion-icon>
+        <ng-template #usuarios>
+
+          <ion-icon name="menu" class="icon-voltar"></ion-icon>
+        </ng-template>
       </button>
     </ion-buttons>
     <ion-title *ngIf="sala">{{sala.nome}}</ion-title>

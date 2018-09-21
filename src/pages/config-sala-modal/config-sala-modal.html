@@ -21,30 +21,41 @@
 <ion-content padding>
 
   <ion-list>
-    <ion-item>
-      <ion-label>Bloquear usuários</ion-label>
-      <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear" (ionChange)="bloquearUsuarios(usuariosABloquear)">
-        <span *ngFor="let usuario of todosUsuarios">
-          <ion-option *ngIf="!usuario.bloqueado" [value]="usuario">{{usuario.nome}}
-            - {{usuario.bloqueado}}</ion-option>
-        </span>
-      </ion-select>
-    </ion-item>
 
-    <ion-item>
-      <ion-label>Desbloquear usuários</ion-label>
-      <ion-select [(ngModel)]="usuariosADesbloquear" multiple="true" cancelText="Cancelar" okText="Desbloquear"
-        (ionChange)="desbloquearUsuarios(usuariosADesbloquear)">
-        <span *ngFor="let usuario of todosUsuarios">
-          <ion-option *ngIf="usuario.bloqueado" [value]="usuario">{{usuario.nome}}
-            - {{usuario.bloqueado}}</ion-option>
-        </span>
-      </ion-select>
-    </ion-item>
+    <div *ngIf="souOCriador;else naoSouCriador">
+      <ion-item>
+        <ion-label>Bloquear usuários</ion-label>
+        <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear" (ionChange)="bloquearUsuarios(usuariosABloquear)">
+          <span *ngFor="let usuario of todosUsuarios">
+            <ion-option *ngIf="!usuario.bloqueado" [value]="usuario">{{usuario.nome}}
+              - {{usuario.bloqueado}}</ion-option>
+          </span>
+        </ion-select>
+      </ion-item>
 
-    <ion-item>
-      <button ion-button block color="danger" (click)="excluirSala()">Excluir Sala</button>
-    </ion-item>
+      <ion-item>
+        <ion-label>Desbloquear usuários</ion-label>
+        <ion-select [(ngModel)]="usuariosADesbloquear" multiple="true" cancelText="Cancelar" okText="Desbloquear"
+          (ionChange)="desbloquearUsuarios(usuariosADesbloquear)">
+          <span *ngFor="let usuario of todosUsuarios">
+            <ion-option *ngIf="usuario.bloqueado" [value]="usuario">{{usuario.nome}}
+              - {{usuario.bloqueado}}</ion-option>
+          </span>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <button ion-button block color="danger" (click)="excluirSala()">Excluir Sala</button>
+      </ion-item>
+    </div>
+
+    <ng-template #naoSouCriador>
+        <ion-item>
+            <button ion-button block color="danger" (click)="sairDaSala()">Sair da Sala</button>
+          </ion-item>
+    </ng-template>
+
+
 
 
   </ion-list>

@@ -14,9 +14,22 @@
 
 
 <ion-content padding>
+
   <ion-item>
-    <ion-input placeholder="Nome da sala" [(ngModel)]="sala.nome"></ion-input>
+    <ion-label floating>Nome da sala</ion-label>
+    <ion-input [(ngModel)]="sala.nome"></ion-input>
   </ion-item>
+
+  <ion-item>
+    <ion-label> Sala privada</ion-label>
+    <ion-toggle [(ngModel)]="sala.privada"></ion-toggle>
+  </ion-item>
+
+  <ion-item *ngIf="sala.privada">
+    <ion-label floating>Senha</ion-label>
+    <ion-input type="Password" [(ngModel)]="sala.senha"></ion-input>
+  </ion-item>
+
   <ion-row>
     <ion-col>
       <button ion-button color="danger" (click)="fecharModal()" type="submit">Cancelar</button>

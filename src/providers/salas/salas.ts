@@ -27,7 +27,7 @@ export class SalasProvider {
   };
 
   async getAllNaoBloqueadas() {
-
+    const that = this;
     const keyUsuarioAtual = this.usuarioProvider.getIdUsuarioAtual();
     let retorno;
     let arraySalasDisponiveis = [];
@@ -51,7 +51,12 @@ export class SalasProvider {
 
           let s = sala.val();
           s.key = sala.key;
-          arraySalasDisponiveis.push(s);
+          that.salaTemAlgumAmigo(sala.key).then(function (res) {
+            s.temAmigo = res;
+            arraySalasDisponiveis.push(s);
+            // return res;
+          });
+
         }
       })
 
@@ -66,6 +71,11 @@ export class SalasProvider {
 
   get(key: string) {
     return this.db.object('salas/' + key).valueChanges();
+  };
+
+  // Get Sem Listener
+  getSL(key: string) {
+    return this.db.database.ref('salas/' + key).once('value');
   };
 
   save(sala: any) {
@@ -100,6 +110,17 @@ export class SalasProvider {
     return this.db.database.ref('salas/' + keySala + '/usuarios').once('value');
   };
 
+  getAllAmigosSemListener(keySala, keyUsuario?) {
+    if (!keyUsuario) {
+      keyUsuario = this.usuarioProvider.getIdUsuarioAtual();
+    }
+
+    return this.db.database.ref('usuarios/' + keyUsuario + '/amigos').once('value');
+  };
+
+  AmITheCreator(keySala) {
+    return this.getSL(keySala).then(res => res.val().criador === this.usuarioProvider.getEmailUsuarioAtual());
+  }
 
 
   async getArrayAllUsuariosDeUmaSalaSemListener(keySala) {
@@ -159,11 +180,52 @@ export class SalasProvider {
     });
   };
 
-  async salaTemUsuario(keySala, keyUsuario) {
+  async salaTemUsuario(keySala, keyUsuario?) {
+
+    if (!keyUsuario) {
+      keyUsuario = this.usuarioProvider.getIdUsuarioAtual();
+    }
     return await this.db.database.ref('salas/' + keySala + '/usuarios/').orderByKey().equalTo(keyUsuario).once('value').then(function (snapshot) {
-      return snapshot.val() !== null;
+
+      let esta = snapshot.val() !== null;
+      // console.log(keyUsuario + ' na sala ' + keySala + ' = ' + esta);
+
+      return esta;
     });
   };
+
+  getArrayAllAmigosSemListener(keySala) {
+    const that = this;
+    let arrayAmigos = [];
+
+    return this.getAllAmigosSemListener(keySala).then(function (amigos) {
+      amigos.forEach(function (amigo) {
+        arrayAmigos.push({
+          'keyDB': amigo.key,
+          'keyAmigo': amigo.val().key
+        })
+
+      })
+    }).then(function (res) {
+      return arrayAmigos;
+    })
+  }
+
+  salaTemAlgumAmigo(keySala) {
+    const that = this;
+    let retorno;
+
+    return this.getArrayAllAmigosSemListener(keySala).then(function (amigos) {
+      amigos.forEach(function (amigo) {
+        retorno = that.salaTemUsuario(keySala, amigo.keyAmigo).then(function (amigoEstaNaSala) {
+          if (amigoEstaNaSala) {
+            return true;
+          }
+        })
+      })
+      return retorno;
+    });
+  }
 
   async cadastrarUsuarioNaSala(keySala, keyUsuario) {
     const that = this;
@@ -179,4 +241,8 @@ export class SalasProvider {
     })
 
   };
+
+  removerUsuarioDaSala(keySala, keyUsuario?) {
+    this.db.list('salas/' + keySala + '/usuarios/').remove(keyUsuario ? keyUsuario : this.usuarioProvider.getIdUsuarioAtual());
+  }
 }

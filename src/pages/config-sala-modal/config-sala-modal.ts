@@ -20,20 +20,18 @@ export class ConfigSalaModalPage {
 
   salaKey;
   todosUsuarios;
+  souOCriador;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController,
     private salasProvider: SalasProvider,
-    public toastCtrl: ToastController ) {
+    public toastCtrl: ToastController) {
+
+    const that = this;
 
     this.salaKey = navParams.get('keySala');
-
-
-
-
-    // this.salasProvider.getAllUsuariosDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
-    //   console.log(usuarios.val());
-    //   that.todosUsuarios = usuarios.val();
-    // });
+    this.souOCriador = this.salasProvider.AmITheCreator(this.salaKey).then(function (res) {
+      that.souOCriador = res;
+    });
   }
 
   ionViewDidLoad() {
@@ -64,12 +62,16 @@ export class ConfigSalaModalPage {
     this.atualizarListaUsuariosABloquear();
   }
 
-  
-
   excluirSala() {
     //Remove a sala do DB
     this.salasProvider.remove(this.salaKey);
     this.navCtrl.popToRoot();
+  }
+
+  sairDaSala() {
+    this.salasProvider.removerUsuarioDaSala(this.salaKey);
+    this.viewCtrl.dismiss ({usuarioSaiuDaSala: true});
+    // this.navCtrl.popToRoot();
   }
 
   fecharModal() {

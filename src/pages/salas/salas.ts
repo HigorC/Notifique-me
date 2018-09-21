@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
 import { RegistrarSalaPage } from '../registrar-sala/registrar-sala';
 import { SalasProvider } from '../../providers/salas/salas';
 import { Observable } from 'rxjs/Observable';
@@ -14,46 +14,112 @@ import { ConversaPage } from '../conversa/conversa';
 
 @IonicPage()
 @Component({
-  selector: 'page-salas',
-  templateUrl: 'salas.html',
+    selector: 'page-salas',
+    templateUrl: 'salas.html',
 })
 export class SalasPage {
-  // salas: Observable<any>;
-  salas;
+    // salas: Observable<any>;
+    salas;
 
-  constructor(public navCtrl: NavController,
-    public navParams: NavParams,
-    public modalCtrl: ModalController,
-    private salasProvider: SalasProvider) {
-    // this.salas = this.salasProvider.getAll();
-    this.atualizarSalasDisponiveis();
-  }
+    constructor(public navCtrl: NavController,
+        public navParams: NavParams,
+        public modalCtrl: ModalController,
+        private salasProvider: SalasProvider,
+        public alertCtrl: AlertController) {
+        // this.salas = this.salasProvider.getAll();
+        this.atualizarSalasDisponiveis();
+    }
 
-  atualizarSalasDisponiveis() {
-    const that = this;
-    this.salasProvider.getAllNaoBloqueadas().then(function (res) {
-      console.log('aqui');
-      that.salas = res;
-      console.log(res);
-    });
-  }
+    atualizarSalasDisponiveis() {
+        const that = this;
+        this.salasProvider.getAllNaoBloqueadas().then(function (res) {
+            console.log('aqui');
+            that.salas = res;
+            console.log(res);
+        });
+    }
 
-  novaSala() {
-    let profileModal = this.modalCtrl.create(RegistrarSalaPage);
-    profileModal.present();
+    novaSala() {
+        let profileModal = this.modalCtrl.create(RegistrarSalaPage);
+        profileModal.present();
 
-    profileModal.onDidDismiss(data => {
-      console.log(data);
-    });
-  }
+        profileModal.onDidDismiss(data => {
+        });
+    }
 
-  entrarNaSala(sala) {
-    let conversaModal = this.modalCtrl.create(ConversaPage, { salaKey: sala.key });
-    conversaModal.present();
+    entrarNaSala(sala) {
+        let conversaModal = this.modalCtrl.create(ConversaPage, { salaKey: sala.key });
+        conversaModal.present();
 
-    conversaModal.onDidDismiss(data => {
-      console.log(data);
-    });
-  }
+        conversaModal.onDidDismiss(data => {
+            console.log(data);
+        });
+    }
+
+    verificarSenhaSala(sala) {
+        const that = this;
+
+        if (sala.privada) {
+
+            this.salasProvider.salaTemUsuario(sala.key).then(function (usuarioEstaNaSala) {
+
+                if (usuarioEstaNaSala) {
+                    that.entrarNaSala(sala);
+                } else {
+                    let alert = that.alertCtrl.create({
+                        title: 'Sala privada',
+                        message: 'Esta sala é privada, digite a senha para entrar.',
+                        inputs: [
+                            {
+                                name: 'senha',
+                                placeholder: 'Senha',
+                                type: 'password'
+                            }
+                        ],
+                        buttons: [
+                            {
+                                text: 'Cancelar',
+                                role: 'cancel',
+                                handler: data => {
+                                    console.log('Cancel clicked');
+                                }
+                            },
+                            {
+                                text: 'Entrar',
+                                handler: data => {
+                                    console.log(data);
+                                    if (data.senha === sala.senha) {
+                                        that.entrarNaSala(sala);
+                                    } else {
+                                        that.exibirAlertaInformacao("Erro!", "A senha está incorreta.");
+                                    }
+                                }
+                            }
+                        ]
+                    });
+                    alert.present();
+                }
+            })
+        } else {
+            this.entrarNaSala(sala);
+        }
+    }
+
+    exibirInformacaoAmigo() {
+        this.exibirAlertaInformacao("Amigos por perto!", "Você tem um ou mais amigos nesta sala.");
+    }
+
+    exibirInformacaoSalaBloqueada() {
+        this.exibirAlertaInformacao("Bloqueada", "Para entrar nesta sala você precisa de uma senha.");
+    }
+
+    exibirAlertaInformacao(titulo, mensagem) {
+        const alert = this.alertCtrl.create({
+            title: titulo,
+            subTitle: mensagem,
+            buttons: ['OK']
+        });
+        alert.present();
+    }
 
 }

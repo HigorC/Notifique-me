@@ -20,11 +20,13 @@ ion-modal {
 .proprioAutor{
     float: right;
     background-color: #a9d0ff;
+    border-radius: 15px 0px 15px 15px;
 }
 
 .outroAutor{
     float: left;
     background-color: #ececec;
+    border-radius: 0px 15px 15px;
 }
 
 .mensagem{
@@ -32,7 +34,6 @@ ion-modal {
     padding: 7px 10px;
     margin-bottom: 10px;
     clear: both;
-    border-radius: 3px;
     max-width: 85%;
     text-align: justify;
     border: 1px solid #e6e6e6;

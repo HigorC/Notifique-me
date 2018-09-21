@@ -140,26 +140,14 @@ export class UsuarioProvider {
       let keyAmigo = res.val().key;
 
       that.db.database.ref('usuarios/' + keyAmigo + '/amigos/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function(res){
-        console.log('---');
-        
-        console.log(res.val());
-
 
         let keyDBUsuarioAtualComoAmigo = Object.keys(res.val())[0];
 
         that.db.list('usuarios/' + keyAmigo + '/amigos/').remove(keyDBUsuarioAtualComoAmigo).then(function(atualExcluido){
           that.db.list('usuarios/' + that.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
-        });
-        
+        });   
       })
-
-
-      // console.log(res.val().key);
-
     })
-
-
-    // this.db.list('usuarios/' + this.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
   }
 
   getAllAmigos() {
@@ -199,5 +187,4 @@ export class UsuarioProvider {
       )
     );
   }
-
 }

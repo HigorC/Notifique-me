@@ -13,7 +13,7 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class LoginPage {
 
-  user = { email: 'b@b.com', senha: '123456' } as User;
+  user = { email: 'a@a.com', senha: '123456' } as User;
 
   constructor(private afAuth: AngularFireAuth,
     public navCtrl: NavController,

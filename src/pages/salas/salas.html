@@ -1,10 +1,10 @@
 <ion-header>
   <ion-navbar>
-      <ion-buttons right>
-          <button ion-button icon-only (click)="atualizarSalasDisponiveis()">
-            <ion-icon name="refresh" class=""></ion-icon>
-          </button>
-        </ion-buttons>
+    <ion-buttons right>
+      <button ion-button icon-only (click)="atualizarSalasDisponiveis()">
+        <ion-icon name="refresh" class=""></ion-icon>
+      </button>
+    </ion-buttons>
     <ion-title>Salas próximas a você</ion-title>
   </ion-navbar>
 </ion-header>
@@ -12,13 +12,17 @@
 <ion-content>
   <ion-list>
     <ion-item-divider color="light">Disponíveis</ion-item-divider>
-    <ion-item *ngFor="let sala of salas " (click)="entrarNaSala(sala)">
+    <ion-item *ngFor="let sala of salas ">
       <ion-avatar item-start>
         <img src="assets/imgs/group.png">
       </ion-avatar>
-      <h2>{{sala.nome}}</h2>
+      <h2 (click)="verificarSenhaSala(sala)">{{sala.nome}}</h2>
+      <div item-end>
+        <ion-icon *ngIf="sala.temAmigo" name="happy" (click)='exibirInformacaoAmigo()' class="aviso-sala aviso-tem-amigo-na-sala"></ion-icon>
+        <ion-icon *ngIf="sala.privada" name="lock" (click)='exibirInformacaoSalaBloqueada()' class="aviso-sala aviso-sala-bloqueada"></ion-icon>
+      </div>
     </ion-item>
-    
+
 
 
 
@@ -33,6 +37,8 @@
   </ion-list>
 
   <ion-fab bottom right>
-    <button ion-fab (click)="novaSala()"> <ion-icon name="add"></ion-icon></button>
+    <button ion-fab (click)="novaSala()">
+      <ion-icon name="add"></ion-icon>
+    </button>
   </ion-fab>
 </ion-content>
