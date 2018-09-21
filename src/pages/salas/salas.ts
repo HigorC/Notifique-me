@@ -27,15 +27,19 @@ export class SalasPage {
         private salasProvider: SalasProvider,
         public alertCtrl: AlertController) {
         // this.salas = this.salasProvider.getAll();
+        // this.atualizarSalasDisponiveis();
+    }
+
+    ionViewDidEnter(){
+        console.log('atualizando paginas');
+        
         this.atualizarSalasDisponiveis();
     }
 
     atualizarSalasDisponiveis() {
         const that = this;
         this.salasProvider.getAllNaoBloqueadas().then(function (res) {
-            console.log('aqui');
             that.salas = res;
-            console.log(res);
         });
     }
 
@@ -44,6 +48,7 @@ export class SalasPage {
         profileModal.present();
 
         profileModal.onDidDismiss(data => {
+            this.atualizarSalasDisponiveis();
         });
     }
 
@@ -52,7 +57,7 @@ export class SalasPage {
         conversaModal.present();
 
         conversaModal.onDidDismiss(data => {
-            console.log(data);
+            this.atualizarSalasDisponiveis();
         });
     }
 

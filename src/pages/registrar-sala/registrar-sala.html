@@ -29,11 +29,11 @@
     <ion-label floating>Senha</ion-label>
     <ion-input type="Password" [(ngModel)]="sala.senha"></ion-input>
   </ion-item>
-
   <ion-row>
     <ion-col>
       <button ion-button color="danger" (click)="fecharModal()" type="submit">Cancelar</button>
-      <button ion-button color="secondary" (click)="salvarSala(sala)" type="submit">Criar</button>
+      <button ion-button color="secondary" (click)="salvarSala(sala)" [disabled]="sala.nome === '' || (sala.privada === true && sala.senha === '')"
+        type="submit">Criar</button>
     </ion-col>
   </ion-row>
 </ion-content>

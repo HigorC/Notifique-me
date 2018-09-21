@@ -17,7 +17,11 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class RegistrarSalaPage {
 
-  sala = {};
+  sala = {
+    nome: '',
+    privada: false,
+    senha: ''
+  };
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController, private salasProvider: SalasProvider, private usuarioProvider: UsuarioProvider) {
   }
