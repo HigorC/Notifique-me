@@ -4,6 +4,7 @@ import { RegistrarSalaPage } from '../registrar-sala/registrar-sala';
 import { SalasProvider } from '../../providers/salas/salas';
 import { Observable } from 'rxjs/Observable';
 import { ConversaPage } from '../conversa/conversa';
+import { Geofence } from '@ionic-native/geofence';
 
 /**
  * Generated class for the SalasPage page.
@@ -25,9 +26,17 @@ export class SalasPage {
         public navParams: NavParams,
         public modalCtrl: ModalController,
         private salasProvider: SalasProvider,
-        public alertCtrl: AlertController) {
+        public alertCtrl: AlertController,
+        private geofence: Geofence) {
         // this.salas = this.salasProvider.getAll();
         // this.atualizarSalasDisponiveis();
+
+        geofence.initialize().then(
+            // resolved promise does not return a value
+            () => alert('Geofence Plugin Ready'),
+            (err) => alert(err)
+          )
+          
     }
 
     ionViewDidEnter(){

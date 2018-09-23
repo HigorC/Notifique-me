@@ -30,6 +30,9 @@ import { ConfigSalaModalPage } from '../pages/config-sala-modal/config-sala-moda
 import { AmigosPage } from '../pages/amigos/amigos';
 import { AdicionarAmigoModalPage } from '../pages/adicionar-amigo-modal/adicionar-amigo-modal';
 
+import { Geolocation } from '@ionic-native/geolocation';
+import { Geofence } from '@ionic-native/geofence';
+
 @NgModule({
   declarations: [
     MyApp,
@@ -72,7 +75,9 @@ import { AdicionarAmigoModalPage } from '../pages/adicionar-amigo-modal/adiciona
     AmigosProvider,
     SalasProvider,
     ConversasProvider,
-    UsuarioProvider
+    UsuarioProvider,
+    Geofence,
+    Geolocation
   ]
 })
 export class AppModule { }
