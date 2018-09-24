@@ -22,6 +22,8 @@ export class SalasPage {
     // salas: Observable<any>;
     salas;
 
+    msgTeste
+
     constructor(public navCtrl: NavController,
         public navParams: NavParams,
         public modalCtrl: ModalController,
@@ -33,15 +35,15 @@ export class SalasPage {
 
         geofence.initialize().then(
             // resolved promise does not return a value
-            () => alert('Geofence Plugin Ready'),
-            (err) => alert(err)
-          )
-          
+            () => this.msgTeste = 'Geofence Plugin Ready',
+            (err) => this.msgTeste = err
+        )
+
     }
 
-    ionViewDidEnter(){
+    ionViewDidEnter() {
         console.log('atualizando paginas');
-        
+
         this.atualizarSalasDisponiveis();
     }
 
