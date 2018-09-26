@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform } from 'ionic-angular';
 import { RegistrarSalaPage } from '../registrar-sala/registrar-sala';
 import { SalasProvider } from '../../providers/salas/salas';
 import { Observable } from 'rxjs/Observable';
 import { ConversaPage } from '../conversa/conversa';
 import { Geofence } from '@ionic-native/geofence';
+import { Geolocation } from '@ionic-native/geolocation';
 
 /**
  * Generated class for the SalasPage page.
@@ -22,22 +23,47 @@ export class SalasPage {
     // salas: Observable<any>;
     salas;
 
-    msgTeste
+    msgTeste; msgTeste2;
 
     constructor(public navCtrl: NavController,
         public navParams: NavParams,
         public modalCtrl: ModalController,
         private salasProvider: SalasProvider,
         public alertCtrl: AlertController,
-        private geofence: Geofence) {
+        private geofence: Geofence,
+        private geolocation: Geolocation,
+        public platform: Platform) {
         // this.salas = this.salasProvider.getAll();
         // this.atualizarSalasDisponiveis();
 
-        geofence.initialize().then(
-            // resolved promise does not return a value
-            () => this.msgTeste = 'Geofence Plugin Ready',
-            (err) => this.msgTeste = err
-        )
+        platform.ready().then(() => {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            this.geofence.initialize().then(
+                // resolved promise does not return a value
+                () => {
+                    this.msgTeste = 'Geofence Plugin Ready';
+                    console.log('foi');
+                },
+                (err) => {
+                    console.log(err);
+                    this.msgTeste = err
+                }
+            )
+
+            this.geolocation.getCurrentPosition().then((resp) => {
+                // resp.coords.latitude
+                // resp.coords.longitude
+                this.msgTeste2 = resp;
+                console.log(resp);
+
+
+            }).catch((error) => {
+                this.msgTeste2 = 'Error getting location', error;
+            });
+        });
+
+
 
     }
 

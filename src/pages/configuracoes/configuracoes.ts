@@ -32,6 +32,8 @@ export class ConfiguracoesPage {
 
   deslogar() {
     this.afAuth.auth.signOut();
+    // this.navCtrl.childNavCtrl.setRoot(HomePage);
+    // this.navCtrl.pop();
     this.appCtrl.getRootNav().setRoot(LoginPage);
   }
 
