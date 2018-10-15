@@ -13,7 +13,11 @@
 </ion-header>
 
 
-<ion-content padding>
+<ion-content>
+
+  <ion-item class="divider-manual">
+    <ion-label>Informações Gerais</ion-label>
+  </ion-item>
 
   <ion-item>
     <ion-label floating>Nome da sala</ion-label>
@@ -29,6 +33,16 @@
     <ion-label floating>Senha</ion-label>
     <ion-input type="Password" [(ngModel)]="sala.senha"></ion-input>
   </ion-item>
+
+  <ion-item class="divider-manual">
+    <ion-label>Localização</ion-label>
+    <ion-badge item-end>{{sala.raio}} m</ion-badge>
+  </ion-item>
+
+  <ion-item>
+    <ion-range min="20" max="100" step="20" snaps="true" color="secondary" [(ngModel)]="sala.raio"></ion-range>
+  </ion-item>
+
   <ion-row>
     <ion-col>
       <button ion-button color="danger" (click)="fecharModal()" type="submit">Cancelar</button>

@@ -18,11 +18,33 @@
 </ion-header>
 
 
-<ion-content padding>
+<ion-content>
 
   <ion-list>
+    <ion-item-divider color="light">Usuários nesta sala</ion-item-divider>
+
+    <span *ngFor="let usuario of todosUsuarios">
+      <ion-item-sliding *ngIf="!usuario.bloqueado">
+
+        <ion-item>
+          <ion-avatar item-start>
+            <img src="assets/imgs/friend.png">
+          </ion-avatar>
+          <h2> {{usuario.nome}}</h2>
+        </ion-item>
+        <ion-item-options side="rigth">
+          <button ion-button (click)="enviarConvite(usuario)" color="secondary">
+            <ion-icon name="person-add"></ion-icon>
+            Pedir amizade
+          </button>
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </span>
 
     <div *ngIf="souOCriador;else naoSouCriador">
+      <ion-item-divider color="light">Bloquear usuários</ion-item-divider>
       <ion-item>
         <ion-label>Bloquear usuários</ion-label>
         <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear" (ionChange)="bloquearUsuarios(usuariosABloquear)">
@@ -43,16 +65,17 @@
           </span>
         </ion-select>
       </ion-item>
-
+      <ion-item-divider color="light">Avançado</ion-item-divider>
       <ion-item>
         <button ion-button block color="danger" (click)="excluirSala()">Excluir Sala</button>
       </ion-item>
     </div>
 
     <ng-template #naoSouCriador>
-        <ion-item>
-            <button ion-button block color="danger" (click)="sairDaSala()">Sair da Sala</button>
-          </ion-item>
+      <ion-item-divider color="light">Avançado</ion-item-divider>
+      <ion-item>
+        <button ion-button block color="danger" (click)="sairDaSala()">Sair da Sala</button>
+      </ion-item>
     </ng-template>
 
 

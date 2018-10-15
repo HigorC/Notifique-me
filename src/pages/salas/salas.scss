@@ -1,21 +1,26 @@
-page-salas {
-}
-
 .aviso-sala {
-  font-size: 20px;
-  display: block;
+  font-size: 20px!important;
+  display: block!important;
 }
 
 .aviso-tem-amigo-na-sala {
-  color: #50d2506b;
+  // color: unquote(#50d2506b)!important;
   margin-bottom: 5px;
 }
 
 .aviso-sala-bloqueada {
-  color: #00000061;
-  margin-left: 3px;
+  // color: unquote(#00000061)!important;
+  margin-left: 3px!important;
 }
 
 .alert-head {
+  text-align: center !important;
+}
+
+.p-distancia {
+  font-size: 11px!important;
+}
+
+.div-avisos-sala {
   text-align: center!important;
 }

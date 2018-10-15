@@ -2,6 +2,7 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
 
 import { LoginPage } from '../pages/login/login';
 import { AmigosProvider } from '../providers/amigos/amigos';
@@ -33,26 +34,35 @@ import { AdicionarAmigoModalPage } from '../pages/adicionar-amigo-modal/adiciona
 import { Geolocation } from '@ionic-native/geolocation';
 import { Geofence } from '@ionic-native/geofence';
 
+import { Camera, CameraOptions } from '@ionic-native/camera';
+
+import { MapaPage } from '../pages/mapa/mapa';
+import { MapsProvider } from '../providers/maps/maps';
+import { ImagensProvider } from '../providers/imagens/imagens';
+
+
 @NgModule({
   declarations: [
     MyApp,
     LoginPage,
     HomePage,
-    TabsPage, 
+    TabsPage,
     SalasPage,
     RegistrarSalaPage,
     ConversaPage,
     ConfiguracoesPage,
     ConfigSalaModalPage,
     AmigosPage,
-    AdicionarAmigoModalPage
+    AdicionarAmigoModalPage,
+    MapaPage
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(FIREBASE_CONFIG),
     AngularFireAuthModule,
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    HttpClientModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -66,7 +76,8 @@ import { Geofence } from '@ionic-native/geofence';
     ConfiguracoesPage,
     ConfigSalaModalPage,
     AmigosPage,
-    AdicionarAmigoModalPage
+    AdicionarAmigoModalPage,
+    MapaPage
   ],
   providers: [
     StatusBar,
@@ -77,7 +88,10 @@ import { Geofence } from '@ionic-native/geofence';
     ConversasProvider,
     UsuarioProvider,
     Geofence,
-    Geolocation
+    Geolocation,
+    MapsProvider,
+    Camera,
+    ImagensProvider
   ]
 })
 export class AppModule { }

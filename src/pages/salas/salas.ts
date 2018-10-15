@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform, ToastController, LoadingController } from 'ionic-angular';
 import { RegistrarSalaPage } from '../registrar-sala/registrar-sala';
 import { SalasProvider } from '../../providers/salas/salas';
-import { Observable } from 'rxjs/Observable';
 import { ConversaPage } from '../conversa/conversa';
 import { Geofence } from '@ionic-native/geofence';
 import { Geolocation } from '@ionic-native/geolocation';
+import { MapaPage } from '../mapa/mapa';
+import { MapsProvider } from '../../providers/maps/maps';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
+// import { MapsProvider } from '../../providers/maps/maps';
 
 /**
  * Generated class for the SalasPage page.
@@ -20,10 +23,11 @@ import { Geolocation } from '@ionic-native/geolocation';
     templateUrl: 'salas.html',
 })
 export class SalasPage {
-    // salas: Observable<any>;
-    salas;
 
-    msgTeste; msgTeste2;
+    salasProximas; salasDistantes;
+
+    watchPosition;
+    positionAux;
 
     constructor(public navCtrl: NavController,
         public navParams: NavParams,
@@ -31,53 +35,113 @@ export class SalasPage {
         private salasProvider: SalasProvider,
         public alertCtrl: AlertController,
         private geofence: Geofence,
-        private geolocation: Geolocation,
-        public platform: Platform) {
-        // this.salas = this.salasProvider.getAll();
-        // this.atualizarSalasDisponiveis();
+        private geol: Geolocation,
+        public platform: Platform,
+        private mapsProvider: MapsProvider,
+        public loadingCtrl: LoadingController,
+        private usuarioProvider: UsuarioProvider,
+        public toastCtrl: ToastController
+    ) {
+    }
 
-        platform.ready().then(() => {
-            // Okay, so the platform is ready and our plugins are available.
-            // Here you can do any higher level native things you might need.
-            this.geofence.initialize().then(
-                // resolved promise does not return a value
-                () => {
-                    this.msgTeste = 'Geofence Plugin Ready';
-                    console.log('foi');
-                },
-                (err) => {
-                    console.log(err);
-                    this.msgTeste = err
-                }
-            )
-
-            this.geolocation.getCurrentPosition().then((resp) => {
-                // resp.coords.latitude
-                // resp.coords.longitude
-                this.msgTeste2 = resp;
-                console.log(resp);
-
-
-            }).catch((error) => {
-                this.msgTeste2 = 'Error getting location', error;
-            });
-        });
-
-
-
+    inicializarVariaveis() {
+        this.positionAux = {
+            coords: {
+                accuracy: 9999
+            }
+        };
     }
 
     ionViewDidEnter() {
+        // this.inicializarVariaveis();
         console.log('atualizando paginas');
+        const that = this;
+        console.log('aux');
+        console.log(that.positionAux);
 
-        this.atualizarSalasDisponiveis();
+        if (!this.usuarioProvider.getDisplayNameUsuarioAtual()) {
+            const prompt = this.alertCtrl.create({
+                title: 'Apelido',
+                message: "Você precisa de um apelido para entrar em uma sala!",
+                inputs: [
+                    {
+                        name: 'apelido',
+                        placeholder: 'Apelido'
+                    },
+                ],
+                buttons: [
+                    {
+                        text: 'Salvar',
+                        handler: data => {
+                            console.log('Saved clicked');
+                            console.log(data);
+                            if (data.apelido) {
+                                that.usuarioProvider.salvarDisplayName(data.apelido).then(res => {
+                                    that.exibirToast("Salvo com sucesso!");
+                                    return true;
+                                });
+                            } else {
+                                that.exibirToast("Digite seu apelido!");
+                                return false;
+                            }
+                        }
+                    }
+                ]
+            });
+            prompt.present();
+        }
+
+        this.platform.ready().then(() => {
+            that.atualizarSalasDisponiveis();
+        });
+    };
+
+    ionViewDidLeave() {
+        console.log('saiu');
+        navigator.geolocation.clearWatch(this.watchPosition);
     }
 
-    atualizarSalasDisponiveis() {
+    atualizarSalasDisponiveis(refresher?) {
         const that = this;
-        this.salasProvider.getAllNaoBloqueadas().then(function (res) {
-            that.salas = res;
+
+        let loading = this.loadingCtrl.create({
+            content: 'Procurando salas próximas a você...'
         });
+
+        loading.present();
+
+        this.inicializarVariaveis();
+
+        this.watchPosition = navigator.geolocation.watchPosition(function (position) {
+            console.log(position);
+
+            // FALSE APENAS PARA TESTES
+
+            let flag = false;
+
+            if (flag && position.coords.accuracy < that.positionAux.coords.accuracy) {
+                loading.setContent(`Tentando melhorar a precisão... a acurácia atual é de ${position.coords.accuracy.toString()}`);
+                if (position.coords.accuracy < 200) {
+                    that.positionAux = position;
+                }
+
+            } else {
+                loading.setContent(`Carregando salas...`);
+                that.salasProvider.getAllNaoBloqueadas().then(function (res) {
+                    that.salasProximas = res.proximas;
+                    that.salasDistantes = res.distantes;
+                    if (refresher) {
+                        refresher.complete();
+                    }
+                    return res;
+                });
+                loading.dismiss();
+                navigator.geolocation.clearWatch(that.watchPosition);
+            }
+        }, function (err) {
+            console.error(err);
+            loading.dismiss();
+        }, { enableHighAccuracy: true, timeout: 3000 });
     }
 
     novaSala() {
@@ -90,12 +154,18 @@ export class SalasPage {
     }
 
     entrarNaSala(sala) {
+        navigator.geolocation.clearWatch(this.watchPosition);
+
         let conversaModal = this.modalCtrl.create(ConversaPage, { salaKey: sala.key });
         conversaModal.present();
 
         conversaModal.onDidDismiss(data => {
             this.atualizarSalasDisponiveis();
         });
+    }
+
+    goToMap() {
+        this.navCtrl.push(MapaPage, { salas: this.salasProximas.concat(this.salasDistantes) });
     }
 
     verificarSenhaSala(sala) {
@@ -147,12 +217,33 @@ export class SalasPage {
         }
     }
 
+    exibirToast(mensagem) {
+        const toast = this.toastCtrl.create({
+            message: mensagem,
+            duration: 4000,
+            position: 'top'
+        });
+        toast.present();
+    }
+
     exibirInformacaoAmigo() {
-        this.exibirAlertaInformacao("Amigos por perto!", "Você tem um ou mais amigos nesta sala.");
+        // this.exibirAlertaInformacao("Amigos por perto!", "Você tem um ou mais amigos nesta sala.");
+        this.exibirToast('Você tem um ou mais amigos nesta sala!')
     }
 
     exibirInformacaoSalaBloqueada() {
-        this.exibirAlertaInformacao("Bloqueada", "Para entrar nesta sala você precisa de uma senha.");
+        // this.exibirAlertaInformacao("Bloqueada", "Para entrar nesta sala você precisa de uma senha.");
+        this.exibirToast('Para entrar nesta sala você precisa de uma senha!')
+    }
+
+    exibirInformacaoDistancia(distancia) {
+        // this.exibirAlertaInformacao("Distância", "Você está a " + distancia + " metros desta sala.");
+        this.exibirToast("Você está a " + distancia + " metros desta sala!");
+    }
+
+    exibirInformacaoSalaMuitoLonge(distancia) {
+        // this.exibirAlertaInformacao("Longe demais!", "Você está muito distânte desta sala.");
+        this.exibirToast("Você está muito distânte desta sala.!");
     }
 
     exibirAlertaInformacao(titulo, mensagem) {

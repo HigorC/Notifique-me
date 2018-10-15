@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, ActionSheetController, ToastController, ModalController } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, ViewController, ActionSheetController, ToastController, ModalController, Content } from 'ionic-angular';
 import { SalasProvider } from '../../providers/salas/salas';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth'
@@ -21,6 +21,10 @@ import { ConfigSalaModalPage } from '../config-sala-modal/config-sala-modal';
   templateUrl: 'conversa.html',
 })
 export class ConversaPage {
+
+
+  @ViewChild('inputMsg') inputMsg;
+  @ViewChild(Content) content: Content;
 
   salaKey: any;
   sala: any;
@@ -64,6 +68,13 @@ export class ConversaPage {
     this.mensagens = this.salasProvider.getMensagens(this.salaKey);
   }
 
+  ionViewDidEnter() {
+    setTimeout(() => {
+      this.content.scrollToBottom();
+      this.inputMsg.setFocus();
+    }, 150);
+  }
+
   salaExcluida() {
     const toast = this.toastCtrl.create({
       message: 'Esta sala foi deletada, você será redirecionado para a lista de salas.',
@@ -75,23 +86,29 @@ export class ConversaPage {
   }
 
   enviarMensagem(textoMensagem) {
+    if (textoMensagem) {
 
-    let dataAtual: Date = new Date();
-    let horaAtual = dataAtual.getHours() + ":" + dataAtual.getMinutes();
+      let dataAtual: Date = new Date();
+      let horaAtual = dataAtual.getHours() + ":" + dataAtual.getMinutes();
 
-    console.log(horaAtual);
+      console.log(horaAtual);
 
-    let msg = {
-      emailAutor: this.meuEmail,
-      apelidoAutor: this.usuarioProvider.getDisplayNameUsuarioAtual(),
-      mensagem: textoMensagem,
-      dataEnvio: horaAtual
-    } as Mensagem;
+      let msg = {
+        emailAutor: this.meuEmail,
+        apelidoAutor: this.usuarioProvider.getDisplayNameUsuarioAtual(),
+        mensagem: textoMensagem,
+        dataEnvio: horaAtual
+      } as Mensagem;
 
-    console.log(msg);
+      console.log(msg);
 
-    this.salasProvider.enviarMensagem(this.salaKey, msg);
-    this.mensagem = '';
+      this.salasProvider.enviarMensagem(this.salaKey, msg);
+      this.mensagem = '';
+      this.inputMsg.setFocus();
+      console.log(this.content.contentHeight);
+
+      this.content.scrollToBottom();
+    }
   }
 
   mostrarOpcoesDaSala() {

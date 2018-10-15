@@ -4,32 +4,46 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<ion-header>
+<!-- <ion-header>
 
   <ion-navbar>
     <ion-title>Configurações</ion-title>
   </ion-navbar>
 
-</ion-header>
+</ion-header> -->
 
 
-<ion-content padding>
+<ion-content>
+
   <ion-list>
+    <ion-item-divider color="light">Geral</ion-item-divider>
+    <ion-item class="ion-item-img-perfil">
+      <div class="testela">
+        <img id="imgPerfil" *ngIf="imgPath" class='img-perfil' (click)="tirarFoto()" src="{{ imgPath }}">
+        <label class="label_img_perfil" for="imgPerfil"><i>Toque na imagem para alterá-la</i></label>
+      </div>
+
+      <!-- <img *ngIf="imgPath" class='img-perfil' (click)="tirarFoto()" src="{{ imgPath }}"> -->
+
+      <!-- <img *ngIf="!imgPath"  class='img-perfil' (click)="tirarFoto()" src="assets/imgs/friend.png"> -->
+
+
+      <!-- <img class='img-perfil' (click)="tirarFoto()" src="assets/imgs/a.jpg"> -->
+    </ion-item>
     <ion-item>
       <ion-label floating>Apelido</ion-label>
       <ion-input type="text" [(ngModel)]="usuario.displayName"></ion-input>
     </ion-item>
+    <ion-item-divider color="light">Avançados</ion-item-divider>
     <ion-item>
       <button ion-button block (click)="deslogar()">Deslogar</button>
     </ion-item>
-    <ion-item>
-      <button ion-button block (click)="salvar()">Salvar</button>
-    </ion-item>
   </ion-list>
 
-
-
-
-
+  <ion-fab bottom right>
+    <button ion-fab color='secondary' (click)="salvar()">
+      <ion-icon name="checkmark"></ion-icon>
+    </button>
+  </ion-fab>
 
 </ion-content>

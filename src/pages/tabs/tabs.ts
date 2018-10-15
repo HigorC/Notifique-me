@@ -4,6 +4,7 @@ import { HomePage } from '../home/home';
 import { SalasPage } from '../salas/salas';
 import { ConfiguracoesPage } from '../configuracoes/configuracoes';
 import { AmigosPage } from '../amigos/amigos';
+import { MapaPage } from '../mapa/mapa';
 
 @IonicPage()
 @Component({

@@ -5,6 +5,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs';
 import { map, take, filter } from 'rxjs/operators';
 import { UsuarioProvider } from '../usuario/usuario';
+import { MapsProvider } from '../maps/maps';
 
 @Injectable()
 export class SalasProvider {
@@ -13,7 +14,7 @@ export class SalasProvider {
   salasRef: AngularFireList<any>;
   salas: Observable<any[]>;
 
-  constructor(private db: AngularFireDatabase, private usuarioProvider: UsuarioProvider) {
+  constructor(private db: AngularFireDatabase, private usuarioProvider: UsuarioProvider, private mapsProvider: MapsProvider) {
     this.salasRef = this.db.list('salas');
     this.salas = this.salasRef.snapshotChanges().pipe(
       map(changes =>
@@ -30,43 +31,45 @@ export class SalasProvider {
     const that = this;
     const keyUsuarioAtual = this.usuarioProvider.getIdUsuarioAtual();
     let retorno;
-    let arraySalasDisponiveis = [];
+    // let arraySalasDisponiveis = [];
 
-    // return this.getAll().forEach(function (salas) {
-    //   retorno = salas.filter(function (sala) {
-
-    //     if (sala.usuarios[keyUsuarioAtual] && sala.usuarios[keyUsuarioAtual].bloqueado === false) {
-
-    //       return sala.usuarios[keyUsuarioAtual].bloqueado === false
-    //     }
-
-    //   })
-    //   return retorno;
-    // })
+    let arraySalasDisponiveis = {
+      done: false,
+      proximas: [],
+      distantes: []
+    };
 
     return this.db.database.ref('salas/').once('value').then(function (salas) {
       salas.forEach(function (sala: any) {
         // console.log(sala.val());
         if (!sala.val().usuarios || !sala.val().usuarios[keyUsuarioAtual] || sala.val().usuarios[keyUsuarioAtual].bloqueado === false) {
-
           let s = sala.val();
           s.key = sala.key;
-          that.salaTemAlgumAmigo(sala.key).then(function (res) {
-            s.temAmigo = res;
-            arraySalasDisponiveis.push(s);
-            // return res;
-          });
+          if (s.coordenadas) {
+            retorno = that.mapsProvider.calcularDistanciaFormula(s.coordenadas).then(function (distancia: any) {
+              console.log('-------------------------------');
+              console.log(s.nome);
+              console.log(s.coordenadas);
+              console.log('distancia = ' + distancia);
+              console.log('raio = ' + s.raio);
+              s.distancia = distancia;
+              if (distancia <= s.raio) {
+                that.salaTemAlgumAmigo(sala.key).then(function (res) {
+                  s.temAmigo = res;
+                  arraySalasDisponiveis.proximas.push(s);
+                });
+              } else {
+                arraySalasDisponiveis.distantes.push(s);
+              }
+            })
 
+
+          }
         }
       })
-
     }).then(function (res) {
-      // console.log(res);
       return arraySalasDisponiveis;
-
     })
-
-
   }
 
   get(key: string) {

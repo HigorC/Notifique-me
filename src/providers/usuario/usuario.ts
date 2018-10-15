@@ -90,10 +90,32 @@ export class UsuarioProvider {
     })
   }
 
+  async salvarDisplayName(displayName, photoURL?) {
+    this.db.object('usuarios/' + this.getIdUsuarioAtual()).update({ nome: displayName });
+    this.aFauth.auth.currentUser.updateProfile(
+      {
+        displayName: displayName,
+        photoURL: photoURL ? photoURL : ''
+      }
+    ).then(function (data) {
+      console.log(data);
+
+    }).catch(function (err) {
+      console.error(err);
+
+    })
+  }
+
   getKeyUsuarioByEmail(email) {
     return this.db.database.ref('usuarios/').orderByChild('email').equalTo(email).once('value').then(function (res) {
       return res.val() ? Object.keys(res.val())[0] : null
     });
+  }
+
+  isMeuAmigo(key) {
+    return this.db.database.ref('usuarios/' + this.getIdUsuarioAtual() + '/amigos/').orderByChild('key').equalTo(key).once('value').then(function (res) {
+      return res.val() !== null
+    })
   }
 
   enviarConviteAmizade(email) {
@@ -136,16 +158,16 @@ export class UsuarioProvider {
   excluirAmigo(keyDBAmigo) {
     const that = this;
     this.db.database.ref('usuarios/' + this.getIdUsuarioAtual() + '/amigos/' + keyDBAmigo).once('value').then(function (res) {
-      
+
       let keyAmigo = res.val().key;
 
-      that.db.database.ref('usuarios/' + keyAmigo + '/amigos/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function(res){
+      that.db.database.ref('usuarios/' + keyAmigo + '/amigos/').orderByChild('key').equalTo(that.getIdUsuarioAtual()).once('value').then(function (res) {
 
         let keyDBUsuarioAtualComoAmigo = Object.keys(res.val())[0];
 
-        that.db.list('usuarios/' + keyAmigo + '/amigos/').remove(keyDBUsuarioAtualComoAmigo).then(function(atualExcluido){
+        that.db.list('usuarios/' + keyAmigo + '/amigos/').remove(keyDBUsuarioAtualComoAmigo).then(function (atualExcluido) {
           that.db.list('usuarios/' + that.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
-        });   
+        });
       })
     })
   }

@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, ToastController } 
 import { SalasProvider } from '../../providers/salas/salas';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { LoginPage } from '../login/login';
+import { UsuarioProvider } from '../../providers/usuario/usuario';
 
 /**
  * Generated class for the ConfigSalaModalPage page.
@@ -24,7 +25,8 @@ export class ConfigSalaModalPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController,
     private salasProvider: SalasProvider,
-    public toastCtrl: ToastController) {
+    public toastCtrl: ToastController,
+    private usuarioProvider: UsuarioProvider) {
 
     const that = this;
 
@@ -35,14 +37,46 @@ export class ConfigSalaModalPage {
   }
 
   ionViewDidLoad() {
-    this.atualizarListaUsuariosABloquear();
+    const that = this;
+    this.atualizarListaUsuariosABloquear().then(usuarios => {
+      that.todosUsuarios = usuarios;
+    });
+  }
+
+  exibirToast(mensagem) {
+    const toast = this.toastCtrl.create({
+      message: mensagem,
+      duration: 4000,
+      position: 'top'
+    });
+    toast.present();
+  }
+
+  enviarConvite(usuario) {
+
+    const that = this;
+
+    this.usuarioProvider.isMeuAmigo(usuario.key).then(jaEAmigo => {
+      if (jaEAmigo) {
+        that.exibirToast('Vocês já são amigos!');
+      } else {
+        that.usuarioProvider.enviarConviteAmizade(usuario.email).then(res => {
+          that.exibirToast('Convite enviado!');
+          console.log(res);
+        }).catch(err => {
+          console.log(err);
+          that.exibirToast(err);
+        })
+      }
+    })
   }
 
   atualizarListaUsuariosABloquear() {
     const that = this;
 
-    this.salasProvider.getArrayAllUsuariosDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
-      that.todosUsuarios = usuarios;
+    return this.salasProvider.getArrayAllUsuariosDeUmaSalaSemListener(this.salaKey).then(function (usuarios) {
+      // that.todosUsuarios = usuarios;
+      return usuarios;
     });
   }
 
@@ -70,7 +104,7 @@ export class ConfigSalaModalPage {
 
   sairDaSala() {
     this.salasProvider.removerUsuarioDaSala(this.salaKey);
-    this.viewCtrl.dismiss ({usuarioSaiuDaSala: true});
+    this.viewCtrl.dismiss({ usuarioSaiuDaSala: true });
     // this.navCtrl.popToRoot();
   }
 

@@ -55,7 +55,7 @@
   <ion-grid>
     <ion-row>
       <ion-col col-10>
-        <ion-input placeholder="Digite" round [(ngModel)]="mensagem"></ion-input>
+        <ion-input #inputMsg placeholder="Digite" round [(ngModel)]="mensagem"></ion-input>
       </ion-col>
       <ion-col col-2>
         <button ion-button (click)="enviarMensagem(mensagem)">

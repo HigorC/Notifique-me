@@ -1,20 +1,25 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>Login</ion-title>
-  </ion-navbar>
-</ion-header>
+<ion-content text-center class="vertical-align-content conteudo-login">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h1 >Bem-Vindo</h1>
+        <ion-item class="input-login__email ">
+          <ion-label floating>Email</ion-label>
+          <ion-input type="text" [(ngModel)]="user.email"></ion-input>
+        </ion-item>
 
-<ion-content padding>
-  <ion-item>
-    <ion-label floating>Email</ion-label>
-    <ion-input type="text" [(ngModel)]="user.email"></ion-input>
-  </ion-item>
-  
-  <ion-item>
-    <ion-label floating>Senha</ion-label>
-    <ion-input type="password" [(ngModel)]="user.senha"></ion-input>
-  </ion-item>
+        <ion-item  *ngIf="user.email" class="input-login__senha ">
+          <ion-label floating>Senha</ion-label>
+          <ion-input type="password" [(ngModel)]="user.senha"></ion-input>
+        </ion-item>
+        <div class="clear"></div>
+        <button *ngIf="user.email && user.senha" class="btn-login" ion-button block (click)="login(user)">Entrar</button>
 
-  <button ion-button (click)="login(user)">Entrar</button>
-  <button ion-button (click)="register()">Registrar</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+
+<ion-footer>
+  <button ion-button clear (click)="register()">Não possui uma conta ainda?</button>
+</ion-footer>

@@ -4,5 +4,11 @@
     "cordova": {}
   },
   "type": "ionic-angular",
-  "pro_id": "f1788d5a"
+  "pro_id": "f1788d5a",
+  "proxies": [
+    {
+      "path": "/distancematrix",
+      "proxyUrl": "https://maps.googleapis.com/maps/api/"
+    }
+  ]
 }
