@@ -21,7 +21,8 @@
     <ion-item-sliding *ngFor="let convite of meusConvites">
       <ion-item>
         <ion-avatar item-start>
-          <img src="assets/imgs/friend.png">
+          <!-- <img src="assets/imgs/friend.png"> -->
+          <img src="{{convite.urlImagemPerfil}}" alt="">
         </ion-avatar>
         <h2>{{convite.nome}}</h2>
         <h2>{{convite.email}}</h2>
@@ -51,7 +52,8 @@
     <ion-item-sliding *ngFor="let amigo of meusAmigos">
       <ion-item>
         <ion-avatar item-start>
-          <img src="assets/imgs/friend.png">
+          <img src="{{amigo.urlImagemPerfil}}" alt="">
+          <!-- <img src="assets/imgs/friend.png"> -->
         </ion-avatar>
         <h2>{{amigo.nome}}</h2>
         <h2>{{amigo.email}}</h2>

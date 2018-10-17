@@ -17,8 +17,8 @@
 
   <ion-list>
     <ion-item-divider color="light">Geral</ion-item-divider>
-    <ion-item class="ion-item-img-perfil">
-      <div class="testela">
+    <ion-item>
+      <div class="div_perfil">
         <img id="imgPerfil" *ngIf="imgPath" class='img-perfil' (click)="tirarFoto()" src="{{ imgPath }}">
         <label class="label_img_perfil" for="imgPerfil"><i>Toque na imagem para alterá-la</i></label>
       </div>

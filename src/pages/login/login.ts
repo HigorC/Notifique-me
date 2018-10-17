@@ -60,6 +60,9 @@ export class LoginPage {
         case "auth/invalid-email":
           that.exibirToast('Este email é inválido!');
           break;
+        case "auth/network-request-failed":
+          that.exibirToast('Sem conexão!');
+          break;
       }
       console.log(error);
     });

@@ -21,6 +21,17 @@
 <ion-content>
 
   <ion-list>
+    <ion-item-divider color="light">Geral</ion-item-divider>
+    <ion-item>
+      <div class="div_foto">
+        <img id="imgSala" *ngIf="imgPath" (click)="tirarFoto()" src="{{ imgPath }}">
+        <label for="imgSala"><i>Toque na imagem para alterá-la</i></label>
+      </div>
+    </ion-item>
+    <ion-item>
+      <button ion-button block color="light" (click)="showPrompt()">Alterar nome da sala</button>
+    </ion-item>
+
     <ion-item-divider color="light">Usuários nesta sala</ion-item-divider>
 
     <span *ngFor="let usuario of todosUsuarios">
@@ -28,7 +39,8 @@
 
         <ion-item>
           <ion-avatar item-start>
-            <img src="assets/imgs/friend.png">
+            <!-- <img src="assets/imgs/friend.png"> -->
+            <img src="{{usuario.urlImagemPerfil}}" alt="">
           </ion-avatar>
           <h2> {{usuario.nome}}</h2>
         </ion-item>

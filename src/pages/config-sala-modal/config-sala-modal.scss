@@ -1,3 +1,22 @@
-page-config-sala-modal {
+.div_foto_config_sala {
+  text-align: center !important;
+  label {
+    color: #ccc !important;
+  }
+}
 
+.img_sala_config {
+  height: 160px;
+  width: 55%;
+  border-radius: 100%;
+  margin: 0 auto;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  display: block;
+  box-shadow: 0px 0px 10px 1px #ccc !important;
+}
+
+.label_img_sala_config {
+  color: #ccc !important;
+  font-size: 13px !important;
 }

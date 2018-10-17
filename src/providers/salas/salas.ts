@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { map, take, filter } from 'rxjs/operators';
 import { UsuarioProvider } from '../usuario/usuario';
 import { MapsProvider } from '../maps/maps';
+import { ImagensProvider } from '../imagens/imagens';
 
 @Injectable()
 export class SalasProvider {
@@ -14,7 +15,11 @@ export class SalasProvider {
   salasRef: AngularFireList<any>;
   salas: Observable<any[]>;
 
-  constructor(private db: AngularFireDatabase, private usuarioProvider: UsuarioProvider, private mapsProvider: MapsProvider) {
+  constructor(
+    private db: AngularFireDatabase,
+    private usuarioProvider: UsuarioProvider,
+    private mapsProvider: MapsProvider,
+    private imagensProvider: ImagensProvider) {
     this.salasRef = this.db.list('salas');
     this.salas = this.salasRef.snapshotChanges().pipe(
       map(changes =>
@@ -46,6 +51,11 @@ export class SalasProvider {
           let s = sala.val();
           s.key = sala.key;
           if (s.coordenadas) {
+
+            that.imagensProvider.downloadImagem('/salas/', sala.key).then(res => {
+              s.urlImgSala = res ? res : 'assets/imgs/group.png';
+            });
+
             retorno = that.mapsProvider.calcularDistanciaFormula(s.coordenadas).then(function (distancia: any) {
               console.log('-------------------------------');
               console.log(s.nome);
@@ -81,8 +91,19 @@ export class SalasProvider {
     return this.db.database.ref('salas/' + key).once('value');
   };
 
+  getNomeSala(key) {
+    // return this.db.database.ref('salas/' + key).once('value').then(sala =>{
+    //   console.log(sala.val());
+
+    // });
+  }
+
+  updateNomeSala(key, nome) {
+    return this.db.object('salas/' + key).update({ nome: nome });
+  }
+
   save(sala: any) {
-    this.salasRef.push(sala);
+    return this.salasRef.push(sala);
   };
 
   remove(key: string) {
@@ -142,14 +163,17 @@ export class SalasProvider {
 
         usuario.then(function (u) {
           if (u.key !== that.usuarioProvider.getIdUsuarioAtual()) {
-            arrayAllUsuarios.push(
-              {
-                key: u.key,
-                nome: u.val().nome,
-                email: u.val().email,
-                bloqueado: usuarioSala.val().bloqueado
-              }
-            );
+            that.imagensProvider.downloadImagem('/usuarios/', u.key).then(caminhoImagem => {
+              arrayAllUsuarios.push(
+                {
+                  key: u.key,
+                  nome: u.val().nome,
+                  email: u.val().email,
+                  bloqueado: usuarioSala.val().bloqueado,
+                  urlImagemPerfil: caminhoImagem ? caminhoImagem : 'assets/imgs/group.png'
+                }
+              );
+            })
           }
         })
       })

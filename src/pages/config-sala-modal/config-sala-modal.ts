@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, ToastController, LoadingController, AlertController } from 'ionic-angular';
 import { SalasProvider } from '../../providers/salas/salas';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { LoginPage } from '../login/login';
 import { UsuarioProvider } from '../../providers/usuario/usuario';
+import { ImagensProvider } from '../../providers/imagens/imagens';
+
+import { Camera, CameraOptions } from '@ionic-native/camera';
+import * as firebase from 'firebase';
 
 /**
  * Generated class for the ConfigSalaModalPage page.
@@ -22,15 +26,24 @@ export class ConfigSalaModalPage {
   salaKey;
   todosUsuarios;
   souOCriador;
+  imgPath;
+  nomeSala;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController,
+  constructor(public navCtrl: NavController,
+    public navParams: NavParams,
+    public viewCtrl: ViewController,
     private salasProvider: SalasProvider,
     public toastCtrl: ToastController,
-    private usuarioProvider: UsuarioProvider) {
+    private usuarioProvider: UsuarioProvider,
+    public loadingCtrl: LoadingController,
+    private camera: Camera,
+    private imagensProvider: ImagensProvider,
+    public alertCtrl: AlertController) {
 
     const that = this;
 
     this.salaKey = navParams.get('keySala');
+    this.nomeSala = this.navParams.get('nomeSala');
     this.souOCriador = this.salasProvider.AmITheCreator(this.salaKey).then(function (res) {
       that.souOCriador = res;
     });
@@ -41,12 +54,16 @@ export class ConfigSalaModalPage {
     this.atualizarListaUsuariosABloquear().then(usuarios => {
       that.todosUsuarios = usuarios;
     });
+
+    this.imagensProvider.downloadImagem('/salas/', this.salaKey).then(res => {
+      this.imgPath = res ? res : 'assets/imgs/group.png';
+    });
   }
 
-  exibirToast(mensagem) {
+  exibirToast(mensagem, tempo?) {
     const toast = this.toastCtrl.create({
       message: mensagem,
-      duration: 4000,
+      duration: tempo ? tempo : 4000,
       position: 'top'
     });
     toast.present();
@@ -112,4 +129,79 @@ export class ConfigSalaModalPage {
     this.viewCtrl.dismiss();
   }
 
+  showPrompt() {
+    const prompt = this.alertCtrl.create({
+      title: 'Alterar nome da sala',
+      message: "Digite o novo nome da sala",
+      inputs: [
+        {
+          name: 'nome',
+          value: this.nomeSala
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Salvar',
+          handler: data => {
+            this.salasProvider.updateNomeSala(this.salaKey, data.nome).then(res => {
+              this.nomeSala = data.nome;
+              this.exibirToast('Nome alterado!', 2000);
+            });
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
+
+
+  async tirarFoto() {
+    const that = this;
+    try {
+      const options: CameraOptions = {
+        quality: 100,
+        destinationType: this.camera.DestinationType.DATA_URL,
+        encodingType: this.camera.EncodingType.JPEG,
+        mediaType: this.camera.MediaType.PICTURE,
+        targetWidth: 700,
+        targetHeight: 700
+      }
+
+      const result = await this.camera.getPicture(options);
+
+      // const image = `data:image/jpeg;base64,${result}`;
+      this.imgPath = `data:image/jpeg;base64,${result}`;
+
+      let loading = this.loadingCtrl.create({
+        content: 'Salvando imagem da sala...'
+      });
+
+      loading.present();
+
+      // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
+      this.imagensProvider.salvarImagem('/salas/', this.salaKey, this.imgPath).then(res => {
+        loading.dismiss();
+        if (res.state === 'success') {
+          console.log('res.state é succes');
+          const toast = that.toastCtrl.create({
+            message: 'Imagem da sala alterada!',
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        } else {
+          console.log('res.state nao é succes');
+          console.log(res);
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }

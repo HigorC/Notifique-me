@@ -20,6 +20,22 @@
   </ion-item>
 
   <ion-item>
+    <div class="div_foto_grupo">
+      <img *ngIf="imgPath" id="imgPerfil" class='img_grupo' (click)="tirarFoto()" src="{{ imgPath }}">
+
+      <img *ngIf="!imgPath" class='img_grupo' (click)="tirarFoto()" src="assets/imgs/group.png">
+      <label class="label_img_perfil" for="imgPerfil"><i>Toque na imagem para alterá-la</i></label>
+    </div>
+
+    <!-- <img *ngIf="imgPath" class='img-perfil' (click)="tirarFoto()" src="{{ imgPath }}"> -->
+
+    <!-- <img *ngIf="!imgPath"  class='img-perfil' (click)="tirarFoto()" src="assets/imgs/friend.png"> -->
+
+
+    <!-- <img class='img-perfil' (click)="tirarFoto()" src="assets/imgs/a.jpg"> -->
+  </ion-item>
+
+  <ion-item>
     <ion-label floating>Nome da sala</ion-label>
     <ion-input [(ngModel)]="sala.nome"></ion-input>
   </ion-item>

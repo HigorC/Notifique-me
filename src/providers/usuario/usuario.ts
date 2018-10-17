@@ -181,6 +181,7 @@ export class UsuarioProvider {
           return {
             // key: c.payload.key, ...c.payload.val(),
             key: c.key,
+            uid: c.payload.val().key,
             u: that.getUsuarioPorId(c.payload.val().key).then(function (res) {
               return res.val();
             })
@@ -200,6 +201,7 @@ export class UsuarioProvider {
           return {
             // key: c.payload.key, ...c.payload.val(),
             key: c.key,
+            uid: c.payload.val().key,
             u: that.getUsuarioPorId(c.payload.val().key).then(function (res) {
               return res.val();
             })

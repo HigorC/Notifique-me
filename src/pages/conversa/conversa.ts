@@ -112,7 +112,7 @@ export class ConversaPage {
   }
 
   mostrarOpcoesDaSala() {
-    const modal = this.modalCtrl.create(ConfigSalaModalPage, { 'keySala': this.salaKey });
+    const modal = this.modalCtrl.create(ConfigSalaModalPage, { 'keySala': this.salaKey, 'nomeSala': this.sala.nome });
     modal.onDidDismiss(data => {
       if (data && data.usuarioSaiuDaSala)
         this.voltarParaSalas();

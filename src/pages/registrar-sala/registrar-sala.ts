@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, LoadingController, ToastController } from 'ionic-angular';
 import { SalasProvider } from '../../providers/salas/salas';
 import { UsuarioProvider } from '../../providers/usuario/usuario';
 import { Geolocation } from '@ionic-native/geolocation';
 import { MapsProvider } from '../../providers/maps/maps';
+import { ImagensProvider } from '../../providers/imagens/imagens';
+
+import * as firebase from 'firebase';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 /**
  * Generated class for the RegistrarSalaPage page.
  *
@@ -24,7 +28,7 @@ export class RegistrarSalaPage {
     senha: '',
     raio: 60
   };
-
+  imgPath: string;
   positionAux; watchPosition;
 
   constructor(
@@ -35,7 +39,10 @@ export class RegistrarSalaPage {
     private salasProvider: SalasProvider,
     private usuarioProvider: UsuarioProvider,
     private mapasProvider: MapsProvider,
-    public loadingCtrl: LoadingController) {
+    public loadingCtrl: LoadingController,
+    private imagensProvider: ImagensProvider,
+    private camera: Camera,
+    private toastCtrl: ToastController) {
   }
 
   resetarVariaveis() {
@@ -68,7 +75,15 @@ export class RegistrarSalaPage {
           lng: that.positionAux.coords.longitude
         }
         sala.criador = that.usuarioProvider.getEmailUsuarioAtual();
-        that.salasProvider.save(sala);
+
+
+
+        that.salasProvider.save(sala).then(res => {
+          console.log(res);
+          // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
+          that.imagensProvider.salvarImagem('/salas/', res.key, that.imgPath);
+
+        });
         loading.dismiss();
         that.viewCtrl.dismiss();
       }
@@ -85,6 +100,38 @@ export class RegistrarSalaPage {
     //   this.salasProvider.save(sala);
     //   this.viewCtrl.dismiss();
     // })
+  }
+
+  async tirarFoto() {
+    const that = this;
+    try {
+      const options: CameraOptions = {
+        quality: 100,
+        destinationType: this.camera.DestinationType.DATA_URL,
+        encodingType: this.camera.EncodingType.JPEG,
+        mediaType: this.camera.MediaType.PICTURE,
+        targetWidth: 700,
+        targetHeight: 700
+      }
+
+      const result = await this.camera.getPicture(options);
+
+      // const image = `data:image/jpeg;base64,${result}`;
+      this.imgPath = `data:image/jpeg;base64,${result}`;
+
+
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  salvarImagem(imagem) {
+    console.log('imagem = ', imagem);
+
+    console.log('usuarios/' + this.usuarioProvider.getIdUsuarioAtual());
+
+    const pictures = firebase.storage().ref('/usuarios/' + this.usuarioProvider.getIdUsuarioAtual());
+    return pictures.putString(imagem, 'data_url');
   }
 
   fecharModal() {

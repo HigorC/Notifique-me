@@ -103,8 +103,15 @@ export class ConfiguracoesPage {
       // const image = `data:image/jpeg;base64,${result}`;
       this.imgPath = `data:image/jpeg;base64,${result}`;
 
+      let loading = this.loadingCtrl.create({
+        content: 'Salvando imagem de perfil...'
+      });
+  
+      loading.present();
+
       // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
       this.imagensProvider.salvarImagem('/usuarios/', this.usuarioProvider.getIdUsuarioAtual(), this.imgPath).then(res => {
+        loading.dismiss();
         if (res.state === 'success') {
           console.log('res.state é succes');
           const toast = that.toastCtrl.create({

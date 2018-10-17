@@ -1,7 +1,21 @@
-page-registrar-sala {
-
+.img_grupo {
+  height: 160px;
+  width: 55%;
+  border-radius: 100%;
+  margin: 0 auto !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  display: block;
+  box-shadow: 0px 0px 10px 1px #ccc !important;
 }
 
-.divider-manual{
-    background-color: #f3f3f3;
+.div_foto_grupo {
+  text-align: center !important;
+  label {
+    color: #ccc !important;
+  }
+}
+
+.divider-manual {
+  background-color: #f3f3f3;
 }

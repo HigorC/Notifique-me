@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, ToastController } from 'ionic-angular';
 import { AdicionarAmigoModalPage } from '../adicionar-amigo-modal/adicionar-amigo-modal';
 import { UsuarioProvider } from '../../providers/usuario/usuario';
+import { ImagensProvider } from '../../providers/imagens/imagens';
 
 /**
  * Generated class for the AmigosPage page.
@@ -20,8 +21,13 @@ export class AmigosPage {
   meusConvites;
   meusAmigos;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private usuarioProvider: UsuarioProvider,
-    public toastCtrl: ToastController) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public modalCtrl: ModalController,
+    private usuarioProvider: UsuarioProvider,
+    public toastCtrl: ToastController,
+    private imagensProvider: ImagensProvider) {
 
     this.prepararConvites();
     this.prepararAmigos();
@@ -33,14 +39,16 @@ export class AmigosPage {
       that.meusConvites = [];
       convites.forEach(function (convite) {
         convite.u.then(function (res) {
-
-          let conviteCerto = {
-            key: convite.key,
-            nome: res.nome,
-            email: res.email
-          };
-
-          that.meusConvites.push(conviteCerto)
+          that.imagensProvider.downloadImagem('/usuarios/', convite.uid).then(caminhoImagem => {
+            let conviteCerto = {
+              key: convite.key,
+              nome: res.nome,
+              email: res.email,
+              urlImagemPerfil: caminhoImagem ? caminhoImagem : 'assets/imgs/friend.png'
+            };
+  
+            that.meusConvites.push(conviteCerto)
+          })
         })
       })
     })
@@ -52,14 +60,15 @@ export class AmigosPage {
       that.meusAmigos = [];
       amigos.forEach(function (amigo) {
         amigo.u.then(function (res) {
-
-          let amigoCerto = {
-            key: amigo.key,
-            nome: res.nome,
-            email: res.email
-          };
-
-          that.meusAmigos.push(amigoCerto)
+          that.imagensProvider.downloadImagem('/usuarios/', amigo.uid).then(caminhoImagem => {
+            let amigoCerto:any = {
+              key: amigo.key,
+              nome: res.nome,
+              email: res.email,
+              urlImagemPerfil: caminhoImagem ? caminhoImagem : 'assets/imgs/friend.png'
+            };
+            that.meusAmigos.push(amigoCerto)
+          })
         })
       })
     })
