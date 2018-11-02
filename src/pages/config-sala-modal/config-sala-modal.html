@@ -21,25 +21,28 @@
 <ion-content>
 
   <ion-list>
-    <ion-item-divider color="light">Geral</ion-item-divider>
-    <ion-item>
+    <ion-item-divider *ngIf="souOCriador" color="light">Geral</ion-item-divider>
+    <ion-item *ngIf="souOCriador">
       <div class="div_foto">
         <img id="imgSala" *ngIf="imgPath" (click)="tirarFoto()" src="{{ imgPath }}">
         <label for="imgSala"><i>Toque na imagem para alterá-la</i></label>
       </div>
     </ion-item>
-    <ion-item>
-      <button ion-button block color="light" (click)="showPrompt()">Alterar nome da sala</button>
+    <ion-item *ngIf="souOCriador">
+      <button ion-button block color="light" (click)="alterarNomeSala()">Alterar nome da sala</button>
+    </ion-item>
+    <ion-item *ngIf="souOCriador">
+      <button ion-button block color="light" (click)="alterarDescricaoSala()">Alterar descrição da sala</button>
     </ion-item>
 
-    <ion-item-divider color="light">Usuários nesta sala</ion-item-divider>
+    <ion-item-divider *ngIf="todosUsuarios &&   (todosUsuarios && todosUsuarios.length > 0)" color="light">Usuários
+      nesta sala</ion-item-divider>
 
     <span *ngFor="let usuario of todosUsuarios">
       <ion-item-sliding *ngIf="!usuario.bloqueado">
 
         <ion-item>
           <ion-avatar item-start>
-            <!-- <img src="assets/imgs/friend.png"> -->
             <img src="{{usuario.urlImagemPerfil}}" alt="">
           </ion-avatar>
           <h2> {{usuario.nome}}</h2>
@@ -50,33 +53,36 @@
             Pedir amizade
           </button>
         </ion-item-options>
-
       </ion-item-sliding>
 
     </span>
 
     <div *ngIf="souOCriador;else naoSouCriador">
-      <ion-item-divider color="light">Bloquear usuários</ion-item-divider>
-      <ion-item>
-        <ion-label>Bloquear usuários</ion-label>
-        <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear" (ionChange)="bloquearUsuarios(usuariosABloquear)">
-          <span *ngFor="let usuario of todosUsuarios">
-            <ion-option *ngIf="!usuario.bloqueado" [value]="usuario">{{usuario.nome}}
-              - {{usuario.bloqueado}}</ion-option>
-          </span>
-        </ion-select>
-      </ion-item>
 
-      <ion-item>
-        <ion-label>Desbloquear usuários</ion-label>
-        <ion-select [(ngModel)]="usuariosADesbloquear" multiple="true" cancelText="Cancelar" okText="Desbloquear"
-          (ionChange)="desbloquearUsuarios(usuariosADesbloquear)">
-          <span *ngFor="let usuario of todosUsuarios">
-            <ion-option *ngIf="usuario.bloqueado" [value]="usuario">{{usuario.nome}}
-              - {{usuario.bloqueado}}</ion-option>
-          </span>
-        </ion-select>
-      </ion-item>
+      <span *ngIf="todosUsuarios && todosUsuarios.length > 0">
+        <ion-item-divider color="light">Bloquear usuários</ion-item-divider>
+        <ion-item>
+          <ion-label>Bloquear usuários</ion-label>
+          <ion-select [(ngModel)]="usuariosABloquear" multiple="true" cancelText="Cancelar" okText="Bloquear"
+            (ionChange)="bloquearUsuarios(usuariosABloquear)">
+            <span *ngFor="let usuario of todosUsuarios">
+              <ion-option *ngIf="!usuario.bloqueado" [value]="usuario">{{usuario.nome}}</ion-option>
+            </span>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Desbloquear usuários</ion-label>
+          <ion-select [(ngModel)]="usuariosADesbloquear" multiple="true" cancelText="Cancelar" okText="Desbloquear"
+            (ionChange)="desbloquearUsuarios(usuariosADesbloquear)">
+            <span *ngFor="let usuario of todosUsuarios">
+              <ion-option *ngIf="usuario.bloqueado" [value]="usuario">{{usuario.nome}}</ion-option>
+            </span>
+          </ion-select>
+        </ion-item>
+      </span>
+
+
       <ion-item-divider color="light">Avançado</ion-item-divider>
       <ion-item>
         <button ion-button block color="danger" (click)="excluirSala()">Excluir Sala</button>

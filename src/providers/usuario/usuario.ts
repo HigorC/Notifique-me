@@ -168,7 +168,7 @@ export class UsuarioProvider {
         that.db.list('usuarios/' + keyAmigo + '/amigos/').remove(keyDBUsuarioAtualComoAmigo).then(function (atualExcluido) {
           that.db.list('usuarios/' + that.getIdUsuarioAtual() + '/amigos/').remove(keyDBAmigo);
         });
-      })
+      }) 
     })
   }
 

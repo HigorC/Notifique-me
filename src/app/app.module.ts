@@ -36,9 +36,14 @@ import { Geofence } from '@ionic-native/geofence';
 
 import { Camera, CameraOptions } from '@ionic-native/camera';
 
+import { FileChooser } from '@ionic-native/file-chooser';
+import { File } from '@ionic-native/file';
+
+
 import { MapaPage } from '../pages/mapa/mapa';
 import { MapsProvider } from '../providers/maps/maps';
 import { ImagensProvider } from '../providers/imagens/imagens';
+import { ArquivosProvider } from '../providers/arquivos/arquivos';
 
 
 @NgModule({
@@ -91,7 +96,10 @@ import { ImagensProvider } from '../providers/imagens/imagens';
     Geolocation,
     MapsProvider,
     Camera,
-    ImagensProvider
+    ImagensProvider,
+    FileChooser,
+    File,
+    ArquivosProvider
   ]
 })
 export class AppModule { }

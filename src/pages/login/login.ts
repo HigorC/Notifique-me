@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, UrlSerializer, LoadingController, AlertController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, UrlSerializer, LoadingController, AlertController, ToastController, Platform } from 'ionic-angular';
 import { User } from '../../models/user';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { convertUrlToSegments } from 'ionic-angular/umd/navigation/url-serializer';
@@ -13,22 +13,29 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class LoginPage {
 
-  user = { email: 'a@a.com', senha: '123456' } as User;
+  // user = { email: 'a@a.com', senha: '123456' } as User;
+
+  user = { email: ''};
 
   constructor(private afAuth: AngularFireAuth,
     public navCtrl: NavController,
     private usuarioProvider: UsuarioProvider,
     public loadingCtrl: LoadingController,
+    public platform: Platform,
     public alertCtrl: AlertController,
     public toastCtrl: ToastController) {
 
-    let emailArmazenado = localStorage.getItem('email');
-    let senhaArmazenada = localStorage.getItem('senha');
+    this.platform.ready().then(() => {
 
-    if (emailArmazenado) {
-      console.log('tem email');
-      this.login({ email: emailArmazenado, senha: senhaArmazenada })
-    }
+      let emailArmazenado = localStorage.getItem('email');
+      let senhaArmazenada = localStorage.getItem('senha');
+
+      if (emailArmazenado) {
+        console.log('tem email');
+        this.login({ email: emailArmazenado, senha: senhaArmazenada })
+      }
+    });
+
   }
 
   login(user) {

@@ -41,6 +41,11 @@
   </ion-item>
 
   <ion-item>
+      <ion-label floating>Descrição</ion-label>
+      <ion-input [(ngModel)]="sala.descricao" maxlength="30"></ion-input>
+    </ion-item>
+
+  <ion-item>
     <ion-label> Sala privada</ion-label>
     <ion-toggle [(ngModel)]="sala.privada"></ion-toggle>
   </ion-item>

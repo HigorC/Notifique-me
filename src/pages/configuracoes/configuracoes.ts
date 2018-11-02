@@ -73,16 +73,23 @@ export class ConfiguracoesPage {
 
     loading.present();
 
-    this.imagensProvider.salvarImagem('/usuarios/', this.usuarioProvider.getIdUsuarioAtual(), this.imgPath).then(res => {
-      if (res.state === "success") {
+    // this.imagensProvider.salvarImagem('/usuarios/', this.usuarioProvider.getIdUsuarioAtual(), this.imgPath).then(res => {
+    //   if (res.state === "success") {
 
-      }
-      console.log(res);
-    })
+    //   }
+    //   console.log(res);
+    // })
 
     this.usuarioProvider.atualizarUsuario(this.usuario).then(res => {
       console.log(res);
       loading.dismiss();
+
+      const toast = this.toastCtrl.create({
+        message: 'Alterações salvas!',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();
     });
   }
 

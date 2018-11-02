@@ -75,13 +75,13 @@ export class RegistrarSalaPage {
           lng: that.positionAux.coords.longitude
         }
         sala.criador = that.usuarioProvider.getEmailUsuarioAtual();
-
-
+        if (!sala.descricao)
+          sala.descricao = 'Entre para conversar!'
 
         that.salasProvider.save(sala).then(res => {
           console.log(res);
           // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
-          that.imagensProvider.salvarImagem('/salas/', res.key, that.imgPath);
+          that.imagensProvider.salvarImagem('/salas/' + res.key + '/', 'fotoSala', that.imgPath);
 
         });
         loading.dismiss();
@@ -123,15 +123,6 @@ export class RegistrarSalaPage {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  salvarImagem(imagem) {
-    console.log('imagem = ', imagem);
-
-    console.log('usuarios/' + this.usuarioProvider.getIdUsuarioAtual());
-
-    const pictures = firebase.storage().ref('/usuarios/' + this.usuarioProvider.getIdUsuarioAtual());
-    return pictures.putString(imagem, 'data_url');
   }
 
   fecharModal() {

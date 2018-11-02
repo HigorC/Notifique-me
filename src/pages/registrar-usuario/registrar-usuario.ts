@@ -63,7 +63,9 @@ export class RegistrarUsuarioPage {
 
       }
 
-      console.log(error);
+      // console.log(error);
+      console.error(error);
+      
     });
   }
 

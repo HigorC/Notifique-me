@@ -8,6 +8,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { MapaPage } from '../mapa/mapa';
 import { MapsProvider } from '../../providers/maps/maps';
 import { UsuarioProvider } from '../../providers/usuario/usuario';
+import { ImagensProvider } from '../../providers/imagens/imagens';
 // import { MapsProvider } from '../../providers/maps/maps';
 
 /**
@@ -24,10 +25,13 @@ import { UsuarioProvider } from '../../providers/usuario/usuario';
 })
 export class SalasPage {
 
-    salasProximas; salasDistantes;
+    salasProximas = [];
+    salasDistantes = [];
 
     watchPosition;
     positionAux;
+
+    flagTestandoNoPc = false;
 
     constructor(public navCtrl: NavController,
         public navParams: NavParams,
@@ -40,11 +44,38 @@ export class SalasPage {
         private mapsProvider: MapsProvider,
         public loadingCtrl: LoadingController,
         private usuarioProvider: UsuarioProvider,
-        public toastCtrl: ToastController
+        public toastCtrl: ToastController,
+        private imagensProvider: ImagensProvider
     ) {
+
+        this.platform.ready().then(() => {
+            if (this.flagTestandoNoPc) {
+                console.log('Geofence Plugin Ready')
+
+                // this.entrarNaSala({salaKey:'-LNgJIw9rR5neKQWhzp-'});
+                // this.atualizarSalasDisponiveis();
+            } else {
+                this.geofence.initialize().then(
+                    () => {
+                        console.log('Geofence Plugin Ready')
+                        this.atualizarSalasDisponiveis();
+
+                    },
+                    (err) => console.log(err)
+                );
+
+                this.geofence.onTransitionReceived().subscribe(fences => {
+                    console.log('atualizou pelo listener');
+                    this.atualizarSalasDisponiveis();
+                })
+            }
+        });
+
     }
 
     inicializarVariaveis() {
+        this.salasProximas = [];
+        this.salasDistantes = [];
         this.positionAux = {
             coords: {
                 accuracy: 9999
@@ -54,15 +85,17 @@ export class SalasPage {
 
     ionViewDidEnter() {
         // this.inicializarVariaveis();
-        console.log('atualizando paginas');
+        // console.log('atualizando paginas');
         const that = this;
-        console.log('aux');
-        console.log(that.positionAux);
+
+        // console.log('aux');
+        // console.log(that.positionAux);
 
         if (!this.usuarioProvider.getDisplayNameUsuarioAtual()) {
             const prompt = this.alertCtrl.create({
                 title: 'Apelido',
                 message: "Você precisa de um apelido para entrar em uma sala!",
+                enableBackdropDismiss: false,
                 inputs: [
                     {
                         name: 'apelido',
@@ -91,9 +124,7 @@ export class SalasPage {
             prompt.present();
         }
 
-        this.platform.ready().then(() => {
-            that.atualizarSalasDisponiveis();
-        });
+        // TIREI DAQUI
     };
 
     ionViewDidLeave() {
@@ -116,32 +147,122 @@ export class SalasPage {
             console.log(position);
 
             // FALSE APENAS PARA TESTES
+            if (that.flagTestandoNoPc) {
+                that.positionAux.coords.accuracy = 2;
+            }
 
-            let flag = false;
 
-            if (flag && position.coords.accuracy < that.positionAux.coords.accuracy) {
+            if (position.coords.accuracy < that.positionAux.coords.accuracy) {
                 loading.setContent(`Tentando melhorar a precisão... a acurácia atual é de ${position.coords.accuracy.toString()}`);
                 if (position.coords.accuracy < 200) {
                     that.positionAux = position;
                 }
 
             } else {
+                // CANELO O WATCH PARA NÃO MONITORAR MAIS A LOCALIZAÇÃO
+                navigator.geolocation.clearWatch(that.watchPosition);
+
                 loading.setContent(`Carregando salas...`);
-                that.salasProvider.getAllNaoBloqueadas().then(function (res) {
-                    that.salasProximas = res.proximas;
-                    that.salasDistantes = res.distantes;
+                that.salasProvider.getAllSL().then(function (res: any) {
+                    loading.dismiss();
+                    that.exibirToast('Salas carregadas!');
+                    let idFenceNotification = 0;
+                    that.geofence.removeAll().then(resFence => {
+                        console.log(res);
+
+                        res.forEach(sala => {
+                            if (!sala.val().usuarios || !sala.val().usuarios[that.usuarioProvider.getIdUsuarioAtual()] || sala.val().usuarios[that.usuarioProvider.getIdUsuarioAtual()].bloqueado === false) {
+                                // console.log(sala);
+
+                                let s = sala.val();
+                                s.key = sala.key;
+                                if (s.coordenadas) {
+
+                                    that.imagensProvider.downloadImagem('/salas/' + sala.key + '/', 'fotoSala').then(res => {
+                                        s.urlImgSala = res ? res : 'assets/imgs/group.png';
+                                    });
+                                    that.mapsProvider.calcularDistanciaFormula(s.coordenadas).then(function (distancia: any) {
+                                        // DISTANCIA DA SALA
+                                        s.distancia = distancia;
+                                        // VERIFICA SE TEM AMIGO NA SALA
+                                        that.salasProvider.salaTemAlgumAmigo(sala.key).then(function (res) {
+                                            s.temAmigo = res;
+                                        });
+
+                                        //  ADICIONA A SALA NO VETOR DAS PROXIMAS
+                                        if (distancia <= s.raio) {
+                                            that.salasProximas.push(s);
+
+                                            let fence = {
+                                                id: s.key,
+                                                latitude: s.coordenadas.lat, //center of geofence radius
+                                                longitude: s.coordenadas.lng,
+                                                radius: s.raio, //radius to edge of geofence in meters
+                                                transitionType: 2, //see 'Transition Types' below
+                                                notification: { //notification settings
+                                                    id: idFenceNotification++, //any unique ID
+                                                    title: s.nome, //notification title
+                                                    text: 'Você acaba de sair dos limites desta sala ', //notification body
+                                                    openAppOnClick: false, //open app when notification is tapped
+                                                    notification: {
+                                                        vibrate: [0]
+                                                    }
+                                                }
+                                            }
+
+                                            that.geofence.addOrUpdate(fence).then(
+                                                () => console.log('Geofence added'),
+                                                (err) => console.log('Geofence failed to add')
+                                            );
+
+                                        } else {
+                                            that.salasDistantes.push(s);
+
+                                            let fence = {
+                                                id: s.key,
+                                                latitude: s.coordenadas.lat, //center of geofence radius
+                                                longitude: s.coordenadas.lng,
+                                                radius: s.raio, //radius to edge of geofence in meters
+                                                transitionType: 1, //see 'Transition Types' below
+                                                notification: { //notification settings
+                                                    id: idFenceNotification++, //any unique ID
+                                                    title: s.nome, //notification title
+                                                    text: s.descricao, //notification body
+                                                    openAppOnClick: false, //open app when notification is tapped
+                                                    notification: {
+                                                        vibrate: [0]
+                                                    }
+                                                }
+                                            }
+
+                                            that.geofence.addOrUpdate(fence).then(
+                                                () => console.log('Geofence added'),
+                                                (err) => console.log('Geofence failed to add')
+                                            );
+                                        }
+                                    })
+                                }
+                            }
+
+                        })
+
+                    }).catch(err => {
+                        console.error(err);
+                    })
+
+
                     if (refresher) {
                         refresher.complete();
                     }
                     return res;
                 });
-                loading.dismiss();
-                navigator.geolocation.clearWatch(that.watchPosition);
+
+
             }
         }, function (err) {
             console.error(err);
             loading.dismiss();
-        }, { enableHighAccuracy: true, timeout: 3000 });
+        }, { enableHighAccuracy: true, timeout: 5000 });
     }
 
     novaSala() {
@@ -160,7 +281,9 @@ export class SalasPage {
         conversaModal.present();
 
         conversaModal.onDidDismiss(data => {
-            this.atualizarSalasDisponiveis();
+            if (data && data.atualizarSalas) {
+                this.atualizarSalasDisponiveis();
+            }
         });
     }
 
@@ -243,7 +366,7 @@ export class SalasPage {
 
     exibirInformacaoSalaMuitoLonge(distancia) {
         // this.exibirAlertaInformacao("Longe demais!", "Você está muito distânte desta sala.");
-        this.exibirToast("Você está muito distânte desta sala.!");
+        this.exibirToast("Você está muito distante desta sala.!");
     }
 
     exibirAlertaInformacao(titulo, mensagem) {

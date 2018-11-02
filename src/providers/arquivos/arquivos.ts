@@ -1,25 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import * as firebase from 'firebase';
-
 /*
-  Generated class for the ImagensProvider provider.
+  Generated class for the ArquivosProvider provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class ImagensProvider {
-
-  constructor(public http: HttpClient) {
-    console.log('Hello ImagensProvider Provider');
-  }
-
-  salvarImagem(path, nomeImagem, data_url) {
-    const pictures = firebase.storage().ref(path + nomeImagem);
-    return pictures.putString(data_url, 'data_url');
-  }
+export class ArquivosProvider {
 
   async salvarImagemBlob(buffer, path, nomeArquivo) {
     let blob = new Blob([buffer], { type: "image/jpeg" });
@@ -33,6 +22,11 @@ export class ImagensProvider {
       
       alert(JSON.stringify(err));
     })
+  }
+
+  salvarImagem(path, nomeImagem, data_url) {
+    const pictures = firebase.storage().ref(path + nomeImagem);
+    return pictures.putString(data_url, 'data_url');
   }
 
   downloadImagem(path, nomeImagem) {
@@ -49,10 +43,9 @@ export class ImagensProvider {
 
       return url;
     }).catch(function (error) {
-      // console.log(error);
-      
-      // console.error(error);
+      console.error(error);
     });
 
   }
+
 }

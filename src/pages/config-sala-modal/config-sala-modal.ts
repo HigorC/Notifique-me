@@ -28,6 +28,7 @@ export class ConfigSalaModalPage {
   souOCriador;
   imgPath;
   nomeSala;
+  descricaoSala;
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -47,6 +48,12 @@ export class ConfigSalaModalPage {
     this.souOCriador = this.salasProvider.AmITheCreator(this.salaKey).then(function (res) {
       that.souOCriador = res;
     });
+
+    this.salasProvider.getDescricaoSala(this.salaKey).then(descricao => {
+      console.log(descricao.val());
+      
+      this.descricaoSala = descricao.val();
+    })
   }
 
   ionViewDidLoad() {
@@ -55,7 +62,7 @@ export class ConfigSalaModalPage {
       that.todosUsuarios = usuarios;
     });
 
-    this.imagensProvider.downloadImagem('/salas/', this.salaKey).then(res => {
+    that.imagensProvider.downloadImagem('/salas/' + this.salaKey + '/', 'fotoSala').then(res => {
       this.imgPath = res ? res : 'assets/imgs/group.png';
     });
   }
@@ -102,7 +109,9 @@ export class ConfigSalaModalPage {
     usuariosABloquear.forEach(function (usuario) {
       that.salasProvider.alterarBloqueioDeUmUsuarioDeUmaSala(usuario.key, that.salaKey, true);
     });
-    this.atualizarListaUsuariosABloquear();
+    this.atualizarListaUsuariosABloquear().then(usuarios => {
+      that.todosUsuarios = usuarios;
+    });
   }
 
   desbloquearUsuarios(usuariosADesbloquear: any) {
@@ -110,7 +119,9 @@ export class ConfigSalaModalPage {
     usuariosADesbloquear.forEach(function (usuario) {
       that.salasProvider.alterarBloqueioDeUmUsuarioDeUmaSala(usuario.key, that.salaKey, false);
     });
-    this.atualizarListaUsuariosABloquear();
+    this.atualizarListaUsuariosABloquear().then(usuarios => {
+      that.todosUsuarios = usuarios;
+    });
   }
 
   excluirSala() {
@@ -129,7 +140,7 @@ export class ConfigSalaModalPage {
     this.viewCtrl.dismiss();
   }
 
-  showPrompt() {
+  alterarNomeSala() {
     const prompt = this.alertCtrl.create({
       title: 'Alterar nome da sala',
       message: "Digite o novo nome da sala",
@@ -160,6 +171,36 @@ export class ConfigSalaModalPage {
     prompt.present();
   }
 
+  alterarDescricaoSala() {
+    const prompt = this.alertCtrl.create({
+      title: 'Alterar a descrição da sala',
+      message: "Digite a nova descrição da sala",
+      inputs: [
+        {
+          name: 'descricao',
+          value: this.descricaoSala
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Salvar',
+          handler: data => {
+            this.salasProvider.updateDescricaoSala(this.salaKey, data.descricao).then(res => {
+              this.descricaoSala = data.descricao;
+              this.exibirToast('Descrição alterada!', 2000);
+            });
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
 
   async tirarFoto() {
     const that = this;
@@ -185,7 +226,7 @@ export class ConfigSalaModalPage {
       loading.present();
 
       // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
-      this.imagensProvider.salvarImagem('/salas/', this.salaKey, this.imgPath).then(res => {
+      this.imagensProvider.salvarImagem('/salas/' + this.salaKey + '/', 'fotoSala', this.imgPath).then(res => {
         loading.dismiss();
         if (res.state === 'success') {
           console.log('res.state é succes');

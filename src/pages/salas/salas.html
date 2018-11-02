@@ -16,7 +16,10 @@
   </ion-refresher>
 
   <ion-list>
-    <ion-item-divider color="light">Disponíveis</ion-item-divider>
+
+    <ion-item-divider *ngIf="salasProximas && salasProximas.length > 0" color="light">Disponíveis</ion-item-divider>
+    <ion-item-divider *ngIf="salasProximas && salasProximas.length === 0" color="light">Parece que não existem salas na
+      região,<br> seja o primeiro a criar uma!</ion-item-divider>
     <ion-item *ngFor="let sala of salasProximas ">
       <ion-avatar item-start>
         <!-- <img src="assets/imgs/group.png"> -->
@@ -31,22 +34,22 @@
       </div>
     </ion-item>
 
-    <ion-item-divider color="light">Um pouco mais distantes</ion-item-divider>
+    <ion-item-divider *ngIf="salasDistantes && salasDistantes.length > 0" color="light">Um pouco mais distantes</ion-item-divider>
     <ion-item *ngFor="let sala of salasDistantes ">
       <ion-avatar item-start>
-          <img src="{{sala.urlImgSala}}">
+        <img src="{{sala.urlImgSala}}">
       </ion-avatar>
 
       <!-- <ion-thumbnail item-start>
         <img src="assets/imgs/group.png">
       </ion-thumbnail> -->
 
-      <h2 (click)="verificarSenhaSala(sala)">{{sala.nome}}</h2>
+      <!-- <h2 (click)="verificarSenhaSala(sala)">{{sala.nome}}</h2> -->
       <h2 (click)='exibirInformacaoSalaMuitoLonge()'>{{sala.nome}}</h2>
       <div class='div-avisos-sala' item-end>
         <p class='p-distancia' (click)='exibirInformacaoDistancia(sala.distancia)'>{{sala.distancia}} m</p>
-        <ion-icon *ngIf="sala.temAmigo" name="happy" (click)='exibirInformacaoAmigo()' class="aviso-sala aviso-tem-amigo-na-sala"></ion-icon>
-        <ion-icon *ngIf="sala.privada" name="lock" (click)='exibirInformacaoSalaBloqueada()' class="aviso-sala aviso-sala-bloqueada"></ion-icon>
+        <ion-icon *ngIf="sala.temAmigo" name="happy" (click)='exibirInformacaoAmigo()' color='secondary' class="aviso-sala aviso-tem-amigo-na-sala"></ion-icon>
+        <ion-icon *ngIf="sala.privada" name="lock" (click)='exibirInformacaoSalaBloqueada()' color='dark' class="aviso-sala aviso-sala-bloqueada"></ion-icon>
       </div>
     </ion-item>
 

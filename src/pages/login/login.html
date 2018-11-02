@@ -2,18 +2,18 @@
   <ion-grid>
     <ion-row>
       <ion-col>
-        <h1 >Bem-Vindo</h1>
+        <h1>Bem-Vindo</h1>
         <ion-item class="input-login__email ">
           <ion-label floating>Email</ion-label>
           <ion-input type="text" [(ngModel)]="user.email"></ion-input>
         </ion-item>
 
-        <ion-item  *ngIf="user.email" class="input-login__senha ">
+        <ion-item *ngIf="user && user.email && (user.email.length || user.email.length > 0)" class="input-login__senha ">
           <ion-label floating>Senha</ion-label>
           <ion-input type="password" [(ngModel)]="user.senha"></ion-input>
         </ion-item>
         <div class="clear"></div>
-        <button *ngIf="user.email && user.senha" class="btn-login" ion-button block (click)="login(user)">Entrar</button>
+        <button *ngIf="user && user.email && (user.email.length || user.email.length > 0) && user.senha  && (user.senha.length || user.senha.length > 0)" class="btn-login" ion-button block (click)="login(user)">Entrar</button>
 
       </ion-col>
     </ion-row>

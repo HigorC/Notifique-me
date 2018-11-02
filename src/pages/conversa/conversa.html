@@ -1,18 +1,10 @@
-<!--
-  Generated template for the ConversaPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
   <ion-navbar>
     <ion-buttons left>
       <button ion-button icon-only (click)="voltarParaSalas()">
         <ion-icon name="md-arrow-back" class="icon-voltar"></ion-icon>
       </button>
     </ion-buttons>
-
     <ion-buttons right>
       <button ion-button icon-only (click)="mostrarOpcoesDaSala()">
         <ion-icon name="settings" *ngIf="sala && sala.criador === meuEmail; else usuarios" class="icon-voltar"></ion-icon>
@@ -24,38 +16,30 @@
     </ion-buttons>
     <ion-title *ngIf="sala">{{sala.nome}}</ion-title>
   </ion-navbar>
-
-
 </ion-header>
 
 
 
-<ion-content padding>
-  <!-- <ion-card *ngFor="let mensagem of mensagens | async" [ngClass]="{'proprioAutor':mensagem.autor == meuEmail,'outroAutor':mensagem.autor != meuEmail}">
-    <ion-card-header class="autorMensagem">
-      {{mensagem.autor}}
-    </ion-card-header>
-    <ion-card-content>
-      {{mensagem.texto}}
-    </ion-card-content>
-  </ion-card> -->
-
-  <div *ngFor="let mensagem of mensagens | async">
-    <!-- <span *ngIf="mensagem.excluirSala"></span> -->
-    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.emailAutor == meuEmail,'outroAutor':mensagem.emailAutor != meuEmail}">
-      <p class="autor">{{mensagem.apelidoAutor}} - {{mensagem.dataEnvio}}</p>
-      {{mensagem.mensagem}}
+<ion-content id="conte" padding>
+  <div *ngFor="let mensagem of mensagens">
+    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.emailAutor == meuEmail,'outroAutor':mensagem.emailAutor != meuEmail, 'msg_texto':!mensagem.imagem,'msg_img':mensagem.imagem}">
+      <span class="autor">{{mensagem.apelidoAutor}} - {{mensagem.dataEnvio}}</span><br>
+      <span *ngIf="!mensagem.imagem">{{mensagem.mensagem}}</span>
+      <span *ngIf="mensagem.imagem"> <img [src]="mensagem.urlFoto" alt=""></span>
     </span>
   </div>
 </ion-content>
 
-
-<!-- Footer -->
 <ion-footer>
   <ion-grid>
     <ion-row>
-      <ion-col col-10>
+      <ion-col col-8>
         <ion-input #inputMsg placeholder="Digite" round [(ngModel)]="mensagem"></ion-input>
+      </ion-col>
+      <ion-col col-2>
+        <button ion-button color="ligth" (click)="tirarFoto()">
+          <ion-icon name="camera"></ion-icon>
+        </button>
       </ion-col>
       <ion-col col-2>
         <button ion-button (click)="enviarMensagem(mensagem)">
@@ -64,5 +48,4 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-
 </ion-footer>

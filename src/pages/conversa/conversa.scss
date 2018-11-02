@@ -1,4 +1,10 @@
 page-conversa {
+    .msg_texto{
+        max-width: 85%;
+    }
+    .msg_img{
+        max-width: 60%;
+    }
 }
 
 ion-modal {
@@ -34,9 +40,12 @@ ion-modal {
     padding: 7px 10px;
     margin-bottom: 10px;
     clear: both;
-    max-width: 85%;
     text-align: justify;
     border: 1px solid #e6e6e6;
+
+    img{
+        border-radius: 5px;
+    }
 }
 
 ion-footer{

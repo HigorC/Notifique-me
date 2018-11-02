@@ -8,6 +8,9 @@ import { UsuarioProvider } from '../usuario/usuario';
 import { MapsProvider } from '../maps/maps';
 import { ImagensProvider } from '../imagens/imagens';
 
+
+import { Geofence } from '@ionic-native/geofence';
+
 @Injectable()
 export class SalasProvider {
 
@@ -19,7 +22,8 @@ export class SalasProvider {
     private db: AngularFireDatabase,
     private usuarioProvider: UsuarioProvider,
     private mapsProvider: MapsProvider,
-    private imagensProvider: ImagensProvider) {
+    private imagensProvider: ImagensProvider,
+    private geofence: Geofence) {
     this.salasRef = this.db.list('salas');
     this.salas = this.salasRef.snapshotChanges().pipe(
       map(changes =>
@@ -32,53 +36,49 @@ export class SalasProvider {
     return this.salas;
   };
 
-  async getAllNaoBloqueadas() {
-    const that = this;
-    const keyUsuarioAtual = this.usuarioProvider.getIdUsuarioAtual();
-    let retorno;
-    // let arraySalasDisponiveis = [];
+  //  getAllNaoBloqueadas() {
+  //   const that = this;
+  //   const keyUsuarioAtual = this.usuarioProvider.getIdUsuarioAtual();
+  //   let retorno;
+  //   let arraySalasDisponiveis = {
+  //     contSalas: 0,
+  //     proximas: [],
+  //     distantes: []
+  //   };
 
-    let arraySalasDisponiveis = {
-      done: false,
-      proximas: [],
-      distantes: []
-    };
+  //   return this.db.database.ref('salas/').once('value').then(async function (salas) {
+  //     await salas.forEach(function (sala: any) {
+  //       if (!sala.val().usuarios || !sala.val().usuarios[keyUsuarioAtual] || sala.val().usuarios[keyUsuarioAtual].bloqueado === false) {
+  //         let s = sala.val();
+  //         s.key = sala.key;
+  //         if (s.coordenadas) {
 
+  //           that.imagensProvider.downloadImagem('/salas/', sala.key).then(res => {
+  //             s.urlImgSala = res ? res : 'assets/imgs/group.png';
+  //           });
+  //           retorno = that.mapsProvider.calcularDistanciaFormula(s.coordenadas).then(function (distancia: any) {
+  //             s.distancia = distancia;
+  //             arraySalasDisponiveis.contSalas++;
+  //             if (distancia <= s.raio) {
+  //               that.salaTemAlgumAmigo(sala.key).then(function (res) {
+  //                 s.temAmigo = res;
+  //                 arraySalasDisponiveis.proximas.push(s);
+  //               });
+  //             } else {
+  //               arraySalasDisponiveis.distantes.push(s);
+  //             }
+  //           })
+  //         }
+  //       }
+  //     })
+  //   }).then(function (res) {
+  //       return arraySalasDisponiveis;
+  //   })
+  // }
+
+  getAllSL() {
     return this.db.database.ref('salas/').once('value').then(function (salas) {
-      salas.forEach(function (sala: any) {
-        // console.log(sala.val());
-        if (!sala.val().usuarios || !sala.val().usuarios[keyUsuarioAtual] || sala.val().usuarios[keyUsuarioAtual].bloqueado === false) {
-          let s = sala.val();
-          s.key = sala.key;
-          if (s.coordenadas) {
-
-            that.imagensProvider.downloadImagem('/salas/', sala.key).then(res => {
-              s.urlImgSala = res ? res : 'assets/imgs/group.png';
-            });
-
-            retorno = that.mapsProvider.calcularDistanciaFormula(s.coordenadas).then(function (distancia: any) {
-              console.log('-------------------------------');
-              console.log(s.nome);
-              console.log(s.coordenadas);
-              console.log('distancia = ' + distancia);
-              console.log('raio = ' + s.raio);
-              s.distancia = distancia;
-              if (distancia <= s.raio) {
-                that.salaTemAlgumAmigo(sala.key).then(function (res) {
-                  s.temAmigo = res;
-                  arraySalasDisponiveis.proximas.push(s);
-                });
-              } else {
-                arraySalasDisponiveis.distantes.push(s);
-              }
-            })
-
-
-          }
-        }
-      })
-    }).then(function (res) {
-      return arraySalasDisponiveis;
+      return salas;
     })
   }
 
@@ -102,6 +102,14 @@ export class SalasProvider {
     return this.db.object('salas/' + key).update({ nome: nome });
   }
 
+  updateDescricaoSala(key, descricao) {
+    return this.db.object('salas/' + key).update({ descricao: descricao });
+  }
+
+  getDescricaoSala(key) {
+    return this.db.database.ref('salas/' + key + '/descricao').once('value');
+  }
+
   save(sala: any) {
     return this.salasRef.push(sala);
   };
@@ -111,16 +119,53 @@ export class SalasProvider {
   };
 
   getMensagens(keySala) {
+
+    const that = this;
+
     return this.db.list('salas/' + keySala + '/mensagens/').snapshotChanges().pipe(
       map(changes =>
-        changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+        changes.map(function (c: any) {
+
+
+          let retorno = { key: c.payload.key, ...c.payload.val() };
+
+
+          // if (c.payload.val().imagem) {
+          //   console.log('entrou');
+
+          //   retorno.urlFoto = that.imagensProvider.downloadImagem('/salas/' + keySala + '/mensagens/', c.payload.key).then(res => {
+          //     return res;
+          //   })
+          // }
+          // console.log(retorno);
+
+          return retorno;
+        })
       )
     );
   };
 
-  enviarMensagem(KeySala, mensagem) {
-    this.db.list('salas/' + KeySala + '/mensagens/').push(mensagem);
+  getKeyMensagem(KeySala) {
+    return this.db.database.ref('salas/' + KeySala).child('mensagens').push().key;
+  }
+
+  enviarMensagem(KeySala, mensagem, keyMensagem?) {
+    // SE VIER UMA KEY DE MENSAGEM QUER DIZER QUE A MENSAGME EM QUESTÃO É UMA FOTO, SENDO ASSIM
+    // EU FAÇO O DOWNLOAD DA IMAGEM PARA MANDAR PARA O DATABASE REALTIME A URL JÁ CERTA
+    if (keyMensagem) {
+      this.imagensProvider.downloadImagem('/salas/' + KeySala + '/mensagens/', keyMensagem).then(res => {
+        return this.db.object('salas/' + KeySala + '/mensagens/' + keyMensagem).update(Object.assign(mensagem, { urlFoto: res }));
+      })
+    } else {
+      return this.db.list('salas/' + KeySala + '/mensagens/').push(mensagem);
+    }
   };
+
+  // adicionarUrlFotoAMensagem(keySala, keyMensagem) {
+  //   this.imagensProvider.downloadImagem('/salas/' + keySala + '/mensagens/', keyMensagem).then(res => {
+  //     this.db.object('salas/' + keySala + '/mensagens/' + keyMensagem).update({ urlFoto: res });
+  //   })
+  // }
 
   getUsuario(keyUsuario, keySala) {
     return this.db.object('salas/' + keySala + '/usuarios/' + keyUsuario).snapshotChanges();
@@ -170,7 +215,7 @@ export class SalasProvider {
                   nome: u.val().nome,
                   email: u.val().email,
                   bloqueado: usuarioSala.val().bloqueado,
-                  urlImagemPerfil: caminhoImagem ? caminhoImagem : 'assets/imgs/group.png'
+                  urlImagemPerfil: caminhoImagem ? caminhoImagem : 'assets/imgs/friend.png'
                 }
               );
             })
