@@ -1,0 +1,59 @@
+{
+    "salas": {
+        "-LPRB81A1g1-edzPPELw": {
+            "coordenadas": {
+                "lat": -18.5006042,
+                "lng": -54.7460313
+            },
+            "criador": "a@a.com",
+            "descricao": "Ganhe 10% de desconto ao entrar na sala!",
+            "mensagens": {
+                "-LPWRXbeV65AF5mT441J": {
+                    "apelidoAutor": "Zeta",
+                    "dataEnvio": "11:1",
+                    "emailAutor": "z@z.com",
+                    "imagem": true,
+                    "urlFoto": "https://firebasestorage.googleapis.com/v0/b/app-tcc-793bf.appspot.com/o/salas%2F-LPRB81A1g1-edzPPELw%2Fmensagens%2F-LPWRXbeV65AF5mT441J?alt=media&token=b865191f-a24b-4b16-a82b-9153f9ffe5e5"
+                },
+                "-LPWRY0S-HBFndSKikQM": {
+                    "apelidoAutor": "Zeta",
+                    "dataEnvio": "11:1",
+                    "emailAutor": "z@z.com",
+                    "mensagem": "Olá pessoal!"
+                }
+            },
+            "nome": "Super-mercado do Zé",
+            "privada": false,
+            "raio": 20,
+            "senha": "",
+            "usuarios": {
+                "4Ouu3z6U9EhjKJrKqKssi1ztVIw1": {
+                    "bloqueado": false
+                },
+                "wWL5dm1HL0fwXB9vaxtQmxOS9jP2": {
+                    "bloqueado": true
+                }
+            }
+        }
+    },
+    "usuarios": {
+        "4Ouu3z6U9EhjKJrKqKssi1ztVIw1": {
+            "amigos": {
+                "-LPWKqEH9CzGcqIeaHaB": {
+                    "key": "wWL5dm1HL0fwXB9vaxtQmxOS9jP2"
+                }
+            },
+            "email": "z@z.com",
+            "nome": "Zeta"
+        },
+        "wWL5dm1HL0fwXB9vaxtQmxOS9jP2": {
+            "amigos": {
+                "-LO3EuPn5LKDf7B9yshz": {
+                    "key": "4Ouu3z6U9EhjKJrKqKssi1ztVIw1"
+                }
+            },
+            "email": "a@a.com",
+            "nome": "Eu sou o A"
+        }
+    }
+}

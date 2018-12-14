@@ -8,7 +8,6 @@ import { LoginPage } from '../pages/login/login';
 import { AmigosProvider } from '../providers/amigos/amigos';
 
 import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
 
 // import { RANGE_VALUE_ACCESSOR } from '@angular/forms/src/directives/range_value_accessor';
 
@@ -86,7 +85,6 @@ import { ArquivosProvider } from '../providers/arquivos/arquivos';
   ],
   providers: [
     StatusBar,
-    SplashScreen,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     AmigosProvider,
     SalasProvider,

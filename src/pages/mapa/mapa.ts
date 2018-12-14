@@ -20,6 +20,8 @@ declare var google: any;
 })
 export class MapaPage {
   map: GoogleMap;
+  watchPosition;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, public platform: Platform, private geolocation: Geolocation) { }
 
   ionViewDidLoad() {
@@ -44,6 +46,11 @@ export class MapaPage {
     // }
 
 
+  }
+
+  ionViewDidLeave() {
+    console.log('cancelando o watch do mapa');
+    navigator.geolocation.clearWatch(this.watchPosition);
   }
 
   loadMap(lat, lng, salas) {
@@ -78,12 +85,12 @@ export class MapaPage {
 
 
     // setTimeout(function () {
-      navigator.geolocation.watchPosition(function (position) {
-        console.log(position);
-        marker.setPosition({ lat: position.coords.latitude, lng: position.coords.longitude });
-      }, function (err) {
-        console.error(err);
-      }, { enableHighAccuracy: true });
+    this.watchPosition = navigator.geolocation.watchPosition(function (position) {
+      console.log(position);
+      marker.setPosition({ lat: position.coords.latitude, lng: position.coords.longitude });
+    }, function (err) {
+      console.error(err);
+    }, { enableHighAccuracy: true });
     // }, 1000)
 
 

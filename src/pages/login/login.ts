@@ -5,7 +5,6 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { convertUrlToSegments } from 'ionic-angular/umd/navigation/url-serializer';
 import { TabsPage } from '../tabs/tabs';
 import { UsuarioProvider } from '../../providers/usuario/usuario';
-
 @IonicPage()
 @Component({
   selector: 'page-login',
@@ -15,7 +14,7 @@ export class LoginPage {
 
   // user = { email: 'a@a.com', senha: '123456' } as User;
 
-  user = { email: ''};
+  user = { email: '' };
 
   constructor(private afAuth: AngularFireAuth,
     public navCtrl: NavController,
@@ -26,7 +25,6 @@ export class LoginPage {
     public toastCtrl: ToastController) {
 
     this.platform.ready().then(() => {
-
       let emailArmazenado = localStorage.getItem('email');
       let senhaArmazenada = localStorage.getItem('senha');
 

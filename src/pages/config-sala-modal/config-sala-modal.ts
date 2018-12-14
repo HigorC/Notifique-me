@@ -51,7 +51,7 @@ export class ConfigSalaModalPage {
 
     this.salasProvider.getDescricaoSala(this.salaKey).then(descricao => {
       console.log(descricao.val());
-      
+
       this.descricaoSala = descricao.val();
     })
   }
@@ -160,10 +160,14 @@ export class ConfigSalaModalPage {
         {
           text: 'Salvar',
           handler: data => {
-            this.salasProvider.updateNomeSala(this.salaKey, data.nome).then(res => {
-              this.nomeSala = data.nome;
-              this.exibirToast('Nome alterado!', 2000);
-            });
+            if (!data.nome) {
+              this.exibirToast('O nome da sala não pode ser vazio!', 2000);
+            } else {
+              this.salasProvider.updateNomeSala(this.salaKey, data.nome).then(res => {
+                this.nomeSala = data.nome;
+                this.exibirToast('Nome alterado!', 2000);
+              });
+            }
           }
         }
       ]

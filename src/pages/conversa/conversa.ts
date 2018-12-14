@@ -33,6 +33,9 @@ export class ConversaPage {
   mensagem;
   mensagens: any[];
 
+
+  ehLeitura;
+
   msgsSemImagem: any = new Map();
 
   constructor(public navCtrl: NavController,
@@ -88,7 +91,7 @@ export class ConversaPage {
 
       console.log('-------------------------------------');
       console.log(mensagensListener);
-     
+
 
       let ultimaMsg = mensagensListener[mensagensListener.length - 1];
 
@@ -143,11 +146,29 @@ export class ConversaPage {
 
   ionViewDidEnter() {
 
+    this.ehLeitura = this.isSalaLeitura();
 
     setTimeout(() => {
       this.content.scrollToBottom();
       // this.inputMsg.setFocus();
     }, 50);
+  }
+
+  isSalaLeitura() {
+    return (this.sala && this.sala.criador !== this.meuEmail) && (this.sala && this.sala.apenasLeitura);
+  }
+
+  abrirLink(link) {
+    if (link.toLowerCase().startsWith('www')) {
+      window.open('http://' + link);
+    } else {
+      window.open(link);
+    }
+  }
+
+  testarRegex(aTeste) {
+    let patt = new RegExp("(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})");
+    return patt.test(aTeste.toLowerCase());
   }
 
   salaExcluida() {
@@ -157,7 +178,7 @@ export class ConversaPage {
     });
     toast.present();
     // Retorna para a tela anterior
-    this.voltarParaSalas();
+    this.voltarParaSalas(true);
   }
 
   enviarMensagem(textoMensagem?) {
@@ -258,8 +279,11 @@ export class ConversaPage {
     modal.present();
   }
 
-  voltarParaSalas() {
-    this.viewCtrl.dismiss();
+  voltarParaSalas(atualizarSalas?) {
+    if (atualizarSalas) {
+      this.viewCtrl.dismiss({ atualizarSalas: true });
+    } else {
+      this.viewCtrl.dismiss();
+    }
   }
-
 }

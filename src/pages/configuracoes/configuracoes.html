@@ -36,14 +36,17 @@
     </ion-item>
     <ion-item-divider color="light">Avançados</ion-item-divider>
     <ion-item>
-      <button ion-button block (click)="deslogar()">Deslogar</button>
+      <button ion-button block (click)="salvar()" color='secondary'>Salvar Alterações</button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block (click)="deslogar()" color='danger'>Deslogar</button>
     </ion-item>
   </ion-list>
 
-  <ion-fab bottom right>
+  <!-- <ion-fab bottom right>
     <button ion-fab color='secondary' (click)="salvar()">
       <ion-icon name="checkmark"></ion-icon>
     </button>
-  </ion-fab>
+  </ion-fab> -->
 
 </ion-content>

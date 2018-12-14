@@ -26,7 +26,7 @@ export class RegistrarSalaPage {
     nome: '',
     privada: false,
     senha: '',
-    raio: 60
+    raio: 100
   };
   imgPath: string;
   positionAux; watchPosition;
@@ -43,6 +43,11 @@ export class RegistrarSalaPage {
     private imagensProvider: ImagensProvider,
     private camera: Camera,
     private toastCtrl: ToastController) {
+
+    this.positionAux = navParams.get('posicao');
+    console.log(this.positionAux);
+
+
   }
 
   resetarVariaveis() {
@@ -55,8 +60,12 @@ export class RegistrarSalaPage {
 
   salvarSala(sala) {
 
+    // console.log(sala.raio);
+
+    // sala.raio = parseInt(sala.raio);
+    // console.log(sala.raio);
     const that = this;
-    this.resetarVariaveis();
+    // this.resetarVariaveis();
 
     let loading = this.loadingCtrl.create({
       content: 'Salvando sala...'
@@ -65,41 +74,38 @@ export class RegistrarSalaPage {
     loading.present();
 
 
-    this.watchPosition = navigator.geolocation.watchPosition(function (pos) {
-      if (pos.coords.accuracy < that.positionAux.coords.accuracy) {
-        that.positionAux = pos;
-      } else {
-        navigator.geolocation.clearWatch(that.watchPosition);
-        sala.coordenadas = {
-          lat: that.positionAux.coords.latitude,
-          lng: that.positionAux.coords.longitude
-        }
-        sala.criador = that.usuarioProvider.getEmailUsuarioAtual();
-        if (!sala.descricao)
-          sala.descricao = 'Entre para conversar!'
+    // this.watchPosition = navigator.geolocation.watchPosition(function (pos) {
+    // if (pos.coords.accuracy < that.positionAux.coords.accuracy) {
+    //   that.positionAux = pos;
+    // } else {
+    // navigator.geolocation.clearWatch(that.watchPosition);
+    sala.coordenadas = {
+      lat: that.positionAux.coords.latitude,
+      lng: that.positionAux.coords.longitude
+    }
 
-        that.salasProvider.save(sala).then(res => {
-          console.log(res);
-          // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
-          that.imagensProvider.salvarImagem('/salas/' + res.key + '/', 'fotoSala', that.imgPath);
 
-        });
-        loading.dismiss();
-        that.viewCtrl.dismiss();
-      }
-    }, function (err) {
-      console.error(err);
-    }, { enableHighAccuracy: true });
+    console.log(sala);
+    console.log(that.positionAux.coords.latitude);
 
-    // this.geolocation.getCurrentPosition().then((resp) => {
-    //   sala.coordenadas = {
-    //     lat: resp.coords.latitude,
-    //     lng: resp.coords.longitude
-    //   }
-    //   sala.criador = this.usuarioProvider.getEmailUsuarioAtual();
-    //   this.salasProvider.save(sala);
-    //   this.viewCtrl.dismiss();
-    // })
+
+
+    sala.criador = that.usuarioProvider.getEmailUsuarioAtual();
+    if (!sala.descricao)
+      sala.descricao = 'Entre para conversar!'
+
+    that.salasProvider.save(sala).then(res => {
+      console.log(res);
+      // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE
+      that.imagensProvider.salvarImagem('/salas/' + res.key + '/', 'fotoSala', that.imgPath);
+
+    });
+    loading.dismiss();
+    that.viewCtrl.dismiss({ atualizarSalas: true });
+    // }
+    // }, function (err) {
+    //   console.error(err);
+    // }, { enableHighAccuracy: true });
   }
 
   async tirarFoto() {

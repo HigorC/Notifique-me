@@ -25,7 +25,7 @@ import { ImagensProvider } from '../../providers/imagens/imagens';
 })
 export class ConfiguracoesPage {
 
-  usuario = {};
+  usuario: any = {};
   imgPath: string;
   fileToUpload: any;
 
@@ -40,7 +40,7 @@ export class ConfiguracoesPage {
     private imagensProvider: ImagensProvider,
     private toastCtrl: ToastController
   ) {
-    this.usuario = usuarioProvider.getUsuarioAtualSimplificado();
+
   }
 
   ionViewDidLoad() {
@@ -48,6 +48,11 @@ export class ConfiguracoesPage {
     this.imagensProvider.downloadImagem('/usuarios/', this.usuarioProvider.getIdUsuarioAtual()).then(res => {
       this.imgPath = res ? res : 'assets/imgs/friend.png';
     });
+
+  }
+
+  ionViewDidEnter() {
+    this.usuario = this.usuarioProvider.getUsuarioAtualSimplificado();
   }
 
   deslogar() {
@@ -67,12 +72,6 @@ export class ConfiguracoesPage {
   }
 
   salvar() {
-    let loading = this.loadingCtrl.create({
-      content: 'Salvando...'
-    });
-
-    loading.present();
-
     // this.imagensProvider.salvarImagem('/usuarios/', this.usuarioProvider.getIdUsuarioAtual(), this.imgPath).then(res => {
     //   if (res.state === "success") {
 
@@ -80,17 +79,36 @@ export class ConfiguracoesPage {
     //   console.log(res);
     // })
 
-    this.usuarioProvider.atualizarUsuario(this.usuario).then(res => {
-      console.log(res);
-      loading.dismiss();
-
+    if (!this.usuario.displayName) {
       const toast = this.toastCtrl.create({
-        message: 'Alterações salvas!',
-        duration: 3000,
+        message: 'O apelido não pode ser vazio!',
+        duration: 2000,
         position: 'top'
       });
       toast.present();
-    });
+      setTimeout(function () {
+        this.usuario.displayName = '';
+        this.usuario.displayName = this.usuarioProvider.getUsuarioAtualSimplificado().displayName;
+      }, 50);
+    } else {
+      let loading = this.loadingCtrl.create({
+        content: 'Salvando...'
+      });
+
+      loading.present();
+
+      this.usuarioProvider.atualizarUsuario(this.usuario).then(res => {
+        console.log(res);
+        loading.dismiss();
+
+        const toast = this.toastCtrl.create({
+          message: 'Alterações salvas!',
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+      });
+    }
   }
 
   async tirarFoto() {
@@ -113,7 +131,7 @@ export class ConfiguracoesPage {
       let loading = this.loadingCtrl.create({
         content: 'Salvando imagem de perfil...'
       });
-  
+
       loading.present();
 
       // UMA VEZ SALVO O BASE64 NA IMAGEM, PODE-SE SALVAR A IMAGEM NO FIREBASE STORAGE

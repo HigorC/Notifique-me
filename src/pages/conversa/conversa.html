@@ -18,19 +18,21 @@
   </ion-navbar>
 </ion-header>
 
-
-
 <ion-content id="conte" padding>
   <div *ngFor="let mensagem of mensagens">
-    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.emailAutor == meuEmail,'outroAutor':mensagem.emailAutor != meuEmail, 'msg_texto':!mensagem.imagem,'msg_img':mensagem.imagem}">
+    <span class="mensagem" [ngClass]="{'proprioAutor':mensagem.emailAutor == meuEmail,'outroAutor':mensagem.emailAutor != meuEmail,'msgCriador': mensagem.emailAutor == sala.criador ,'msg_texto':!mensagem.imagem,'msg_img':mensagem.imagem}">
       <span class="autor">{{mensagem.apelidoAutor}} - {{mensagem.dataEnvio}}</span><br>
-      <span *ngIf="!mensagem.imagem">{{mensagem.mensagem}}</span>
+      <span *ngIf="!mensagem.imagem">
+        <span [hidden]="testarRegex(mensagem.mensagem)"> {{mensagem.mensagem}}</span>
+        <a [hidden]="!testarRegex(mensagem.mensagem)" (click)="abrirLink(mensagem.mensagem)"> {{mensagem.mensagem}}</a>
+      </span>
       <span *ngIf="mensagem.imagem"> <img [src]="mensagem.urlFoto" alt=""></span>
     </span>
   </div>
 </ion-content>
 
-<ion-footer>
+<ion-footer [hidden]="(sala && sala.criador !== meuEmail) && (sala && sala.apenasLeitura)">
+  <!-- <ion-footer *ngIf="ehLeitura"> -->
   <ion-grid>
     <ion-row>
       <ion-col col-8>

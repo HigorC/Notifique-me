@@ -31,6 +31,8 @@ export class SalasPage {
     watchPosition;
     positionAux;
 
+    tentativasAtualizar;
+
     flagTestandoNoPc = false;
 
     constructor(public navCtrl: NavController,
@@ -64,16 +66,17 @@ export class SalasPage {
                     (err) => console.log(err)
                 );
 
-                this.geofence.onTransitionReceived().subscribe(fences => {
-                    console.log('atualizou pelo listener');
-                    this.atualizarSalasDisponiveis();
-                })
+                // this.geofence.onTransitionReceived().subscribe(fences => {
+                //     console.log('atualizou pelo listener');
+                //     this.atualizarSalasDisponiveis();
+                // })
             }
         });
 
     }
 
     inicializarVariaveis() {
+        this.tentativasAtualizar = 0;
         this.salasProximas = [];
         this.salasDistantes = [];
         this.positionAux = {
@@ -150,27 +153,38 @@ export class SalasPage {
             if (that.flagTestandoNoPc) {
                 that.positionAux.coords.accuracy = 2;
             }
-
-
+            // that.tentativasAtualizar < 6 && 
+            loading.setContent(`Tentando melhorar a precisão... a acurácia atual é de ${position.coords.accuracy.toString()}`);
             if (position.coords.accuracy < that.positionAux.coords.accuracy) {
-                loading.setContent(`Tentando melhorar a precisão... a acurácia atual é de ${position.coords.accuracy.toString()}`);
-                if (position.coords.accuracy < 200) {
+                if (position.coords.accuracy < 10) {
                     that.positionAux = position;
+                } else {
+                    that.tentativasAtualizar++;
                 }
-
+                console.log(that.tentativasAtualizar);
             } else {
+                that.tentativasAtualizar = 0;
                 // CANELO O WATCH PARA NÃO MONITORAR MAIS A LOCALIZAÇÃO
                 navigator.geolocation.clearWatch(that.watchPosition);
 
                 loading.setContent(`Carregando salas...`);
                 that.salasProvider.getAllSL().then(function (res: any) {
-                    loading.dismiss();
-                    that.exibirToast('Salas carregadas!');
+
+                    // console.log(res.val());
+
+                    const qtd_salas = Object.keys(res.val()).length
+                    let contador_salas = 0;
+
+
+
+                    // loading.dismiss();
+                    // that.exibirToast('Salas carregadas!');
                     let idFenceNotification = 0;
                     that.geofence.removeAll().then(resFence => {
                         console.log(res);
 
                         res.forEach(sala => {
+                            contador_salas++;
                             if (!sala.val().usuarios || !sala.val().usuarios[that.usuarioProvider.getIdUsuarioAtual()] || sala.val().usuarios[that.usuarioProvider.getIdUsuarioAtual()].bloqueado === false) {
                                 // console.log(sala);
 
@@ -203,7 +217,7 @@ export class SalasPage {
                                                     id: idFenceNotification++, //any unique ID
                                                     title: s.nome, //notification title
                                                     text: 'Você acaba de sair dos limites desta sala ', //notification body
-                                                    openAppOnClick: false, //open app when notification is tapped
+                                                    openAppOnClick: true, //open app when notification is tapped
                                                     notification: {
                                                         vibrate: [0]
                                                     }
@@ -228,7 +242,7 @@ export class SalasPage {
                                                     id: idFenceNotification++, //any unique ID
                                                     title: s.nome, //notification title
                                                     text: s.descricao, //notification body
-                                                    openAppOnClick: false, //open app when notification is tapped
+                                                    openAppOnClick: true, //open app when notification is tapped
                                                     notification: {
                                                         vibrate: [0]
                                                     }
@@ -244,6 +258,13 @@ export class SalasPage {
                                 }
                             }
 
+
+                            if (contador_salas === qtd_salas) {
+                                setTimeout(function () {
+                                    loading.dismiss();
+                                    that.exibirToast('Salas carregadas!');
+                                }, 500);
+                            }
                         })
 
                     }).catch(err => {
@@ -255,6 +276,8 @@ export class SalasPage {
                         refresher.complete();
                     }
                     return res;
+                }).then(function () {
+
                 });
 
 
@@ -262,15 +285,17 @@ export class SalasPage {
         }, function (err) {
             console.error(err);
             loading.dismiss();
-        }, { enableHighAccuracy: true, timeout: 5000 });
+        }, { enableHighAccuracy: true, timeout: 3000 });
     }
 
     novaSala() {
-        let profileModal = this.modalCtrl.create(RegistrarSalaPage);
+        let profileModal = this.modalCtrl.create(RegistrarSalaPage, { posicao: this.positionAux });
         profileModal.present();
 
         profileModal.onDidDismiss(data => {
-            this.atualizarSalasDisponiveis();
+            if (data && data.atualizarSalas) {
+                this.atualizarSalasDisponiveis();
+            }
         });
     }
 
@@ -366,7 +391,7 @@ export class SalasPage {
 
     exibirInformacaoSalaMuitoLonge(distancia) {
         // this.exibirAlertaInformacao("Longe demais!", "Você está muito distânte desta sala.");
-        this.exibirToast("Você está muito distante desta sala.!");
+        this.exibirToast("Você está muito distante desta sala!");
     }
 
     exibirAlertaInformacao(titulo, mensagem) {
